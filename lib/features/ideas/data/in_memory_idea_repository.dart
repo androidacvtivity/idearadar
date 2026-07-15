@@ -29,4 +29,14 @@ class InMemoryIdeaRepository implements IdeaRepository {
 
     _ideas[index] = idea;
   }
+
+  @override
+  Future<void> deleteIdea(String ideaId) async {
+    final removedIdeas = _ideas.where((idea) => idea.id == ideaId).length;
+    if (removedIdeas != 1) {
+      throw StateError('Idea not found: $ideaId');
+    }
+
+    _ideas.removeWhere((idea) => idea.id == ideaId);
+  }
 }
