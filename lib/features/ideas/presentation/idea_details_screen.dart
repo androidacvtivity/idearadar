@@ -3,10 +3,7 @@ import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 
 class IdeaDetailsScreen extends StatelessWidget {
-  const IdeaDetailsScreen({
-    required this.idea,
-    super.key,
-  });
+  const IdeaDetailsScreen({required this.idea, super.key});
 
   final Idea idea;
 
@@ -201,10 +198,7 @@ class _DetailSection extends StatelessWidget {
 }
 
 class _DateRow extends StatelessWidget {
-  const _DateRow({
-    required this.label,
-    required this.value,
-  });
+  const _DateRow({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -215,10 +209,7 @@ class _DateRow extends StatelessWidget {
       children: [
         Text(label),
         const Spacer(),
-        Text(
-          value,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
       ],
     );
   }

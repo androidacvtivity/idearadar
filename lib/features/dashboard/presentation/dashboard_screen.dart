@@ -93,9 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _openIdea(Idea idea) {
     return Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => IdeaDetailsScreen(idea: idea),
-      ),
+      MaterialPageRoute(builder: (_) => IdeaDetailsScreen(idea: idea)),
     );
   }
 
@@ -298,10 +296,7 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _IdeaCard extends StatelessWidget {
-  const _IdeaCard({
-    required this.idea,
-    required this.onTap,
-  });
+  const _IdeaCard({required this.idea, required this.onTap});
 
   final Idea idea;
   final VoidCallback onTap;
