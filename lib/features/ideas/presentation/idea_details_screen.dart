@@ -23,9 +23,7 @@ class IdeaDetailsScreen extends StatelessWidget {
 
   Future<void> _evaluateIdea(BuildContext context) async {
     final updatedIdea = await Navigator.of(context).push<Idea>(
-      MaterialPageRoute(
-        builder: (_) => IdeaEvaluationScreen(idea: idea),
-      ),
+      MaterialPageRoute(builder: (_) => IdeaEvaluationScreen(idea: idea)),
     );
 
     if (!context.mounted || updatedIdea == null) {

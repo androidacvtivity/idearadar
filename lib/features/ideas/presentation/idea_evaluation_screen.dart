@@ -3,10 +3,7 @@ import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_evaluation.dart';
 
 class IdeaEvaluationScreen extends StatefulWidget {
-  const IdeaEvaluationScreen({
-    required this.idea,
-    super.key,
-  });
+  const IdeaEvaluationScreen({required this.idea, super.key});
 
   final Idea idea;
 
@@ -82,10 +79,7 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
     );
 
     Navigator.of(context).pop(
-      widget.idea.copyWith(
-        evaluation: evaluation,
-        updatedAt: DateTime.now(),
-      ),
+      widget.idea.copyWith(evaluation: evaluation, updatedAt: DateTime.now()),
     );
   }
 
@@ -145,10 +139,11 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
                     Text(
                       '$_totalScore/40',
                       key: const Key('evaluation_total_score'),
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            color: colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.w800,
+                          ),
                     ),
                   ],
                 ),
@@ -176,8 +171,7 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
                 label: 'Competition favorability',
                 description: '5 means lower competition and a better position.',
                 value: _competitionScore,
-                onChanged: (value) =>
-                    setState(() => _competitionScore = value),
+                onChanged: (value) => setState(() => _competitionScore = value),
               ),
               _ScoreControl(
                 label: 'Data access',
@@ -196,7 +190,8 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
                 label: 'Monetization potential',
                 description: 'Is there a credible paying customer or model?',
                 value: _monetizationScore,
-                onChanged: (value) => setState(() => _monetizationScore = value),
+                onChanged: (value) =>
+                    setState(() => _monetizationScore = value),
               ),
               _ScoreControl(
                 label: 'Access to first client',
@@ -230,7 +225,9 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
           key: const Key('save_evaluation_button'),
           onPressed: _saveEvaluation,
           icon: const Icon(Icons.save_outlined),
-          label: Text(isEditing ? 'Save evaluation changes' : 'Save evaluation'),
+          label: Text(
+            isEditing ? 'Save evaluation changes' : 'Save evaluation',
+          ),
         ),
       ),
     );
