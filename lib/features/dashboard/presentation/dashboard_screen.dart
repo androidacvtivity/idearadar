@@ -4,6 +4,7 @@ import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_details_screen.dart';
+import 'package:idearadar/features/ideas/presentation/idea_search_delegate.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({required this.repository, super.key});
@@ -126,6 +127,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Future<void> _searchIdeas() async {
+    if (_ideas.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Add an idea before searching.')),
+      );
+      return;
+    }
+
+    final selectedIdea = await showSearch<Idea>(
+      context: context,
+      delegate: IdeaSearchDelegate(ideas: _ideas),
+    );
+
+    if (!mounted || selectedIdea == null) {
+      return;
+    }
+
+    await _openIdea(selectedIdea);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -139,7 +160,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: _isLoading ? null : _searchIdeas,
             tooltip: 'Search ideas',
             icon: const Icon(Icons.search),
           ),
