@@ -51,6 +51,20 @@ class SqliteIdeaRepository implements IdeaRepository {
     }
   }
 
+  @override
+  Future<void> deleteIdea(String ideaId) async {
+    final database = await _ideaDatabase.database;
+    final deletedRows = await database.delete(
+      IdeaDatabase.ideasTable,
+      where: 'id = ?',
+      whereArgs: [ideaId],
+    );
+
+    if (deletedRows != 1) {
+      throw StateError('Idea not found: $ideaId');
+    }
+  }
+
   Map<String, Object?> _ideaToMap(Idea idea) {
     final evaluation = idea.evaluation;
 
