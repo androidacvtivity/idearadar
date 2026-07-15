@@ -31,5 +31,8 @@ void main() {
     final updatedIdeas = await repository.getIdeas();
     expect(updatedIdeas.single.id, 'idea-001');
     expect(updatedIdeas.single.title, 'Updated IdeaRadar');
+
+    await repository.deleteIdea('idea-001');
+    expect(await repository.getIdeas(), isEmpty);
   });
 }
