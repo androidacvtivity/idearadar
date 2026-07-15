@@ -21,6 +21,7 @@ Clone the repository and generate the Flutter platform files:
 git clone https://github.com/androidacvtivity/idearadar.git
 cd idearadar
 flutter create --org com.bancusoft --project-name idearadar --platforms=android,ios .
+git restore README.md docs/
 ```
 
 The expected application identifiers are:
