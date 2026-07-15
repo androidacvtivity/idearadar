@@ -136,4 +136,43 @@ void main() {
     expect(find.text('Idea details'), findsOneWidget);
     expect(find.text('Agriculture'), findsOneWidget);
   });
+
+  testWidgets('confirms and permanently deletes an idea', (tester) async {
+    final now = DateTime(2026, 7, 15);
+    final repository = InMemoryIdeaRepository(
+      seedIdeas: [
+        Idea(
+          id: 'idea-delete',
+          title: 'Idea to delete',
+          domain: 'Testing',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Idea to delete'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('More actions'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete idea'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Delete idea?'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Idea to delete'), findsNothing);
+    expect(find.text('Your idea radar is ready'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Idea to delete'), findsNothing);
+  });
 }
