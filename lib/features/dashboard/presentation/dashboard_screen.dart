@@ -3,6 +3,7 @@ import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
+import 'package:idearadar/features/ideas/presentation/idea_details_result.dart';
 import 'package:idearadar/features/ideas/presentation/idea_details_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_search_delegate.dart';
 
@@ -93,14 +94,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _openIdea(Idea idea) async {
-    final updatedIdea = await Navigator.of(context).push<Idea>(
+    final result = await Navigator.of(context).push<IdeaDetailsResult>(
       MaterialPageRoute(builder: (_) => IdeaDetailsScreen(idea: idea)),
     );
 
-    if (!mounted || updatedIdea == null) {
+    if (!mounted || result == null) {
       return;
     }
 
+    switch (result) {
+      case IdeaUpdatedResult(:final idea):
+        await _persistUpdatedIdea(idea);
+      case IdeaDeletedResult(:final ideaId):
+        await _persistDeletedIdea(ideaId);
+    }
+  }
+
+  Future<void> _persistUpdatedIdea(Idea updatedIdea) async {
     try {
       await widget.repository.updateIdea(updatedIdea);
 
@@ -123,6 +133,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('The idea could not be updated.')),
+      );
+    }
+  }
+
+  Future<void> _persistDeletedIdea(String ideaId) async {
+    try {
+      await widget.repository.deleteIdea(ideaId);
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _ideas.removeWhere((idea) => idea.id == ideaId);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Idea deleted.')),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('The idea could not be deleted.')),
       );
     }
   }
