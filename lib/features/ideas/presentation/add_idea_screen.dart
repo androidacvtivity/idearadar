@@ -77,123 +77,123 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
         onTap: _dismissKeyboard,
         child: SafeArea(
           child: Form(
-          key: _formKey,
-          autovalidateMode: _showValidationErrors
-              ? AutovalidateMode.onUserInteraction
-              : AutovalidateMode.disabled,
-          child: ListView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
-            children: [
-              Text(
-                'Capture the opportunity',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
+            key: _formKey,
+            autovalidateMode: _showValidationErrors
+                ? AutovalidateMode.onUserInteraction
+                : AutovalidateMode.disabled,
+            child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
+              children: [
+                Text(
+                  'Capture the opportunity',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Start with the problem. You can add evidence and scores later.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                const SizedBox(height: 8),
+                Text(
+                  'Start with the problem. You can add evidence and scores later.',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 28),
-              TextFormField(
-                key: const Key('idea_title_field'),
-                controller: _titleController,
-                textCapitalization: TextCapitalization.sentences,
-                textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                  hintText: 'Example: IdeaRadar',
-                  prefixIcon: Icon(Icons.lightbulb_outline),
+                const SizedBox(height: 28),
+                TextFormField(
+                  key: const Key('idea_title_field'),
+                  controller: _titleController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    hintText: 'Example: IdeaRadar',
+                    prefixIcon: Icon(Icons.lightbulb_outline),
+                  ),
+                  validator: (value) => _requiredValidator(value, 'Title'),
                 ),
-                validator: (value) => _requiredValidator(value, 'Title'),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                key: const Key('idea_domain_field'),
-                controller: _domainController,
-                textCapitalization: TextCapitalization.words,
-                textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                  labelText: 'Domain',
-                  hintText: 'Example: Productivity',
-                  prefixIcon: Icon(Icons.category_outlined),
+                const SizedBox(height: 16),
+                TextFormField(
+                  key: const Key('idea_domain_field'),
+                  controller: _domainController,
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'Domain',
+                    hintText: 'Example: Productivity',
+                    prefixIcon: Icon(Icons.category_outlined),
+                  ),
+                  validator: (value) => _requiredValidator(value, 'Domain'),
                 ),
-                validator: (value) => _requiredValidator(value, 'Domain'),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<IdeaStatus>(
-                key: const Key('idea_status_field'),
-                initialValue: _status,
-                decoration: const InputDecoration(
-                  labelText: 'Status',
-                  prefixIcon: Icon(Icons.flag_outlined),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<IdeaStatus>(
+                  key: const Key('idea_status_field'),
+                  initialValue: _status,
+                  decoration: const InputDecoration(
+                    labelText: 'Status',
+                    prefixIcon: Icon(Icons.flag_outlined),
+                  ),
+                  items: IdeaStatus.values
+                      .map(
+                        (status) => DropdownMenuItem(
+                          value: status,
+                          child: Text(status.label),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (status) {
+                    if (status != null) {
+                      setState(() {
+                        _status = status;
+                      });
+                    }
+                  },
                 ),
-                items: IdeaStatus.values
-                    .map(
-                      (status) => DropdownMenuItem(
-                        value: status,
-                        child: Text(status.label),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (status) {
-                  if (status != null) {
-                    setState(() {
-                      _status = status;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                key: const Key('idea_summary_field'),
-                controller: _summaryController,
-                textCapitalization: TextCapitalization.sentences,
-                textInputAction: TextInputAction.next,
-                minLines: 2,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'Summary',
-                  hintText: 'Describe the idea in a few sentences',
-                  alignLabelWithHint: true,
+                const SizedBox(height: 16),
+                TextFormField(
+                  key: const Key('idea_summary_field'),
+                  controller: _summaryController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.next,
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    labelText: 'Summary',
+                    hintText: 'Describe the idea in a few sentences',
+                    alignLabelWithHint: true,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                key: const Key('idea_problem_field'),
-                controller: _problemController,
-                textCapitalization: TextCapitalization.sentences,
-                textInputAction: TextInputAction.next,
-                minLines: 3,
-                maxLines: 6,
-                decoration: const InputDecoration(
-                  labelText: 'Problem',
-                  hintText: 'What problem does this idea solve?',
-                  alignLabelWithHint: true,
+                const SizedBox(height: 16),
+                TextFormField(
+                  key: const Key('idea_problem_field'),
+                  controller: _problemController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.next,
+                  minLines: 3,
+                  maxLines: 6,
+                  decoration: const InputDecoration(
+                    labelText: 'Problem',
+                    hintText: 'What problem does this idea solve?',
+                    alignLabelWithHint: true,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                key: const Key('idea_solution_field'),
-                controller: _solutionController,
-                textCapitalization: TextCapitalization.sentences,
-                textInputAction: TextInputAction.done,
-                onFieldSubmitted: (_) => _dismissKeyboard(),
-                minLines: 3,
-                maxLines: 6,
-                decoration: const InputDecoration(
-                  labelText: 'Proposed solution',
-                  hintText: 'How could the problem be solved?',
-                  alignLabelWithHint: true,
+                const SizedBox(height: 16),
+                TextFormField(
+                  key: const Key('idea_solution_field'),
+                  controller: _solutionController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _dismissKeyboard(),
+                  minLines: 3,
+                  maxLines: 6,
+                  decoration: const InputDecoration(
+                    labelText: 'Proposed solution',
+                    hintText: 'How could the problem be solved?',
+                    alignLabelWithHint: true,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         ),
       ),
       bottomNavigationBar: SafeArea(
