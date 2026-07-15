@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
+import 'package:idearadar/features/ideas/presentation/idea_evaluation_screen.dart';
 
 class IdeaDetailsScreen extends StatelessWidget {
   const IdeaDetailsScreen({required this.idea, super.key});
@@ -12,6 +13,20 @@ class IdeaDetailsScreen extends StatelessWidget {
     final updatedIdea = await Navigator.of(
       context,
     ).push<Idea>(MaterialPageRoute(builder: (_) => AddIdeaScreen(idea: idea)));
+
+    if (!context.mounted || updatedIdea == null) {
+      return;
+    }
+
+    Navigator.of(context).pop(updatedIdea);
+  }
+
+  Future<void> _evaluateIdea(BuildContext context) async {
+    final updatedIdea = await Navigator.of(context).push<Idea>(
+      MaterialPageRoute(
+        builder: (_) => IdeaEvaluationScreen(idea: idea),
+      ),
+    );
 
     if (!context.mounted || updatedIdea == null) {
       return;
@@ -84,6 +99,7 @@ class IdeaDetailsScreen extends StatelessWidget {
             const SizedBox(height: 20),
             Card(
               child: ListTile(
+                onTap: () => _evaluateIdea(context),
                 leading: CircleAvatar(
                   backgroundColor: colorScheme.secondaryContainer,
                   foregroundColor: colorScheme.onSecondaryContainer,
@@ -95,14 +111,7 @@ class IdeaDetailsScreen extends StatelessWidget {
                       ? 'Not evaluated'
                       : '${idea.totalScore} out of 40',
                 ),
-                trailing: idea.totalScore == null
-                    ? null
-                    : Text(
-                        '${idea.totalScore}/40',
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                trailing: const Icon(Icons.chevron_right),
               ),
             ),
             const SizedBox(height: 20),
