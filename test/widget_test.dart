@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:idearadar/app/idea_radar_app.dart';
 import 'package:idearadar/features/ideas/data/in_memory_idea_repository.dart';
+import 'package:idearadar/features/ideas/domain/idea.dart';
 
 Future<InMemoryIdeaRepository> pumpIdeaRadar(WidgetTester tester) async {
   final repository = InMemoryIdeaRepository();
@@ -101,5 +102,38 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('24/40'), findsOneWidget);
+  });
+
+  testWidgets('searches ideas by domain and opens the result', (tester) async {
+    final now = DateTime(2026, 7, 15);
+    final repository = InMemoryIdeaRepository(
+      seedIdeas: [
+        Idea(
+          id: 'idea-agriculture',
+          title: 'Offline farm journal',
+          domain: 'Agriculture',
+          summary: 'Track field work without a permanent internet connection.',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Search ideas'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'agriculture');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Offline farm journal'), findsOneWidget);
+
+    await tester.tap(find.text('Offline farm journal'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Idea details'), findsOneWidget);
+    expect(find.text('Agriculture'), findsOneWidget);
   });
 }
