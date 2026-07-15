@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
+import 'package:idearadar/features/ideas/presentation/idea_details_result.dart';
 import 'package:idearadar/features/ideas/presentation/idea_evaluation_screen.dart';
 
 class IdeaDetailsScreen extends StatelessWidget {
@@ -18,7 +19,7 @@ class IdeaDetailsScreen extends StatelessWidget {
       return;
     }
 
-    Navigator.of(context).pop(updatedIdea);
+    Navigator.of(context).pop(IdeaUpdatedResult(updatedIdea));
   }
 
   Future<void> _evaluateIdea(BuildContext context) async {
@@ -30,7 +31,43 @@ class IdeaDetailsScreen extends StatelessWidget {
       return;
     }
 
-    Navigator.of(context).pop(updatedIdea);
+    Navigator.of(context).pop(IdeaUpdatedResult(updatedIdea));
+  }
+
+  Future<void> _deleteIdea(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        final colorScheme = Theme.of(dialogContext).colorScheme;
+
+        return AlertDialog(
+          title: const Text('Delete idea?'),
+          content: Text(
+            '“${idea.title}” will be permanently deleted. This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                foregroundColor: colorScheme.onError,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!context.mounted || confirmed != true) {
+      return;
+    }
+
+    Navigator.of(context).pop(IdeaDeletedResult(idea.id));
   }
 
   @override
@@ -46,6 +83,26 @@ class IdeaDetailsScreen extends StatelessWidget {
             onPressed: () => _editIdea(context),
             tooltip: 'Edit idea',
             icon: const Icon(Icons.edit_outlined),
+          ),
+          PopupMenuButton<_IdeaMenuAction>(
+            tooltip: 'More actions',
+            onSelected: (action) {
+              if (action == _IdeaMenuAction.delete) {
+                _deleteIdea(context);
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: _IdeaMenuAction.delete,
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_outline),
+                    SizedBox(width: 12),
+                    Text('Delete idea'),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: 8),
         ],
@@ -243,4 +300,9 @@ class _DateRow extends StatelessWidget {
       ],
     );
   }
+}
+
+
+enum _IdeaMenuAction {
+  delete,
 }
