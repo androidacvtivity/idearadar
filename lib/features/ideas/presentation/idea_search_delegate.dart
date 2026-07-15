@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 
-class IdeaSearchDelegate extends SearchDelegate<Idea> {
+class IdeaSearchDelegate extends SearchDelegate<Idea?> {
   IdeaSearchDelegate({required this.ideas});
 
   final List<Idea> ideas;
