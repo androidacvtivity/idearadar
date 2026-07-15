@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({
+    required this.repository,
+    super.key,
+  });
+
+  final IdeaRepository repository;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -12,6 +18,46 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final List<Idea> _ideas = [];
+  bool _isLoading = true;
+  String? _loadError;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadIdeas();
+  }
+
+  Future<void> _loadIdeas() async {
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
+
+    try {
+      await widget.repository.initialize();
+      final ideas = await widget.repository.getIdeas();
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _ideas
+          ..clear()
+          ..addAll(ideas);
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isLoading = false;
+        _loadError = 'Ideas could not be loaded.';
+      });
+    }
+  }
 
   int get _validatedIdeas {
     return _ideas.where((idea) => idea.status == IdeaStatus.validated).length;
@@ -26,9 +72,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return;
     }
 
-    setState(() {
-      _ideas.insert(0, idea);
-    });
+    try {
+      await widget.repository.addIdea(idea);
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _ideas.insert(0, idea);
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('The idea could not be saved.')),
+      );
+    }
   }
 
   @override
@@ -117,7 +179,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             const SizedBox(height: 28),
-            if (_ideas.isEmpty)
+            if (_isLoading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(32),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (_loadError != null)
+              _LoadError(message: _loadError!, onRetry: _loadIdeas)
+            else if (_ideas.isEmpty)
               _EmptyState(onAddIdea: _addIdea)
             else ...[
               Text(
@@ -136,6 +207,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onPressed: _addIdea,
         icon: const Icon(Icons.add),
         label: const Text('New idea'),
+      ),
+    );
+  }
+}
+
+class _LoadError extends StatelessWidget {
+  const _LoadError({
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 44,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(height: 12),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try again'),
+            ),
+          ],
+        ),
       ),
     );
   }
