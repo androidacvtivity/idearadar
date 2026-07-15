@@ -3,6 +3,7 @@ import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
+import 'package:idearadar/features/ideas/presentation/idea_details_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({required this.repository, super.key});
@@ -88,6 +89,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SnackBar(content: Text('The idea could not be saved.')),
       );
     }
+  }
+
+  Future<void> _openIdea(Idea idea) {
+    return Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => IdeaDetailsScreen(idea: idea),
+      ),
+    );
   }
 
   @override
@@ -195,7 +204,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              for (final idea in _ideas) _IdeaCard(idea: idea),
+              for (final idea in _ideas)
+                _IdeaCard(idea: idea, onTap: () => _openIdea(idea)),
             ],
           ],
         ),
@@ -288,9 +298,13 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _IdeaCard extends StatelessWidget {
-  const _IdeaCard({required this.idea});
+  const _IdeaCard({
+    required this.idea,
+    required this.onTap,
+  });
 
   final Idea idea;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -299,6 +313,7 @@ class _IdeaCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
+        onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         leading: CircleAvatar(
           backgroundColor: colorScheme.primaryContainer,
