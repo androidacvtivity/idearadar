@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:idearadar/app/theme/app_theme.dart';
 import 'package:idearadar/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:idearadar/features/ideas/data/idea_repository.dart';
 
 class IdeaRadarApp extends StatelessWidget {
-  const IdeaRadarApp({super.key});
+  const IdeaRadarApp({
+    required this.repository,
+    super.key,
+  });
+
+  final IdeaRepository repository;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +19,7 @@ class IdeaRadarApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
-      home: const DashboardScreen(),
+      home: DashboardScreen(repository: repository),
     );
   }
 }
