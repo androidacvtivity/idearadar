@@ -54,8 +54,7 @@ class SqliteIdeaRepository implements IdeaRepository {
       'demand_score': evaluation?.demandScore,
       'competition_score': evaluation?.competitionScore,
       'data_access_score': evaluation?.dataAccessScore,
-      'technical_feasibility_score':
-          evaluation?.technicalFeasibilityScore,
+      'technical_feasibility_score': evaluation?.technicalFeasibilityScore,
       'monetization_score': evaluation?.monetizationScore,
       'first_client_score': evaluation?.firstClientScore,
       'evaluation_rationale': evaluation?.rationale,
@@ -97,8 +96,7 @@ class SqliteIdeaRepository implements IdeaRepository {
       demandScore: map['demand_score']! as int,
       competitionScore: map['competition_score']! as int,
       dataAccessScore: map['data_access_score']! as int,
-      technicalFeasibilityScore:
-          map['technical_feasibility_score']! as int,
+      technicalFeasibilityScore: map['technical_feasibility_score']! as int,
       monetizationScore: map['monetization_score']! as int,
       firstClientScore: map['first_client_score']! as int,
       rationale: map['evaluation_rationale'] as String? ?? '',

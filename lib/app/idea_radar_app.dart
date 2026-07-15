@@ -4,10 +4,7 @@ import 'package:idearadar/features/dashboard/presentation/dashboard_screen.dart'
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
 
 class IdeaRadarApp extends StatelessWidget {
-  const IdeaRadarApp({
-    required this.repository,
-    super.key,
-  });
+  const IdeaRadarApp({required this.repository, super.key});
 
   final IdeaRepository repository;
 

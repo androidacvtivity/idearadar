@@ -5,10 +5,7 @@ import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({
-    required this.repository,
-    super.key,
-  });
+  const DashboardScreen({required this.repository, super.key});
 
   final IdeaRepository repository;
 
@@ -213,10 +210,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class _LoadError extends StatelessWidget {
-  const _LoadError({
-    required this.message,
-    required this.onRetry,
-  });
+  const _LoadError({required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;

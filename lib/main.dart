@@ -6,9 +6,5 @@ import 'package:idearadar/features/ideas/data/sqlite_idea_repository.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(
-    IdeaRadarApp(
-      repository: SqliteIdeaRepository(IdeaDatabase()),
-    ),
-  );
+  runApp(IdeaRadarApp(repository: SqliteIdeaRepository(IdeaDatabase())));
 }
