@@ -91,10 +91,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> _openIdea(Idea idea) {
-    return Navigator.of(context).push<void>(
+  Future<void> _openIdea(Idea idea) async {
+    final updatedIdea = await Navigator.of(context).push<Idea>(
       MaterialPageRoute(builder: (_) => IdeaDetailsScreen(idea: idea)),
     );
+
+    if (!mounted || updatedIdea == null) {
+      return;
+    }
+
+    try {
+      await widget.repository.updateIdea(updatedIdea);
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        final index = _ideas.indexWhere(
+          (currentIdea) => currentIdea.id == updatedIdea.id,
+        );
+        if (index != -1) {
+          _ideas[index] = updatedIdea;
+        }
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('The idea could not be updated.')),
+      );
+    }
   }
 
   @override
