@@ -31,10 +31,7 @@ class DashboardScreen extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    colorScheme.primary,
-                    colorScheme.tertiary,
-                  ],
+                  colors: [colorScheme.primary, colorScheme.tertiary],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -43,11 +40,7 @@ class DashboardScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.radar,
-                    color: colorScheme.onPrimary,
-                    size: 36,
-                  ),
+                  Icon(Icons.radar, color: colorScheme.onPrimary, size: 36),
                   const SizedBox(height: 28),
                   Text(
                     'From idea to opportunity.',

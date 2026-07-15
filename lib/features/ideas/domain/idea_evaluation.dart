@@ -14,10 +14,7 @@ class IdeaEvaluation {
        assert(demandScore >= 1 && demandScore <= 5),
        assert(competitionScore >= 1 && competitionScore <= 5),
        assert(dataAccessScore >= 1 && dataAccessScore <= 5),
-       assert(
-         technicalFeasibilityScore >= 1 &&
-             technicalFeasibilityScore <= 5,
-       ),
+       assert(technicalFeasibilityScore >= 1 && technicalFeasibilityScore <= 5),
        assert(monetizationScore >= 1 && monetizationScore <= 5),
        assert(firstClientScore >= 1 && firstClientScore <= 5);
 
