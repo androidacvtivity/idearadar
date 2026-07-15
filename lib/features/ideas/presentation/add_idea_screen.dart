@@ -3,10 +3,7 @@ import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 
 class AddIdeaScreen extends StatefulWidget {
-  const AddIdeaScreen({
-    this.idea,
-    super.key,
-  });
+  const AddIdeaScreen({this.idea, super.key});
 
   final Idea? idea;
 
@@ -101,9 +98,7 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
     final isEditing = widget.idea != null;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Edit idea' : 'Add new idea'),
-      ),
+      appBar: AppBar(title: Text(isEditing ? 'Edit idea' : 'Add new idea')),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: _dismissKeyboard,
@@ -118,7 +113,9 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
               children: [
                 Text(
-                  isEditing ? 'Update the opportunity' : 'Capture the opportunity',
+                  isEditing
+                      ? 'Update the opportunity'
+                      : 'Capture the opportunity',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),

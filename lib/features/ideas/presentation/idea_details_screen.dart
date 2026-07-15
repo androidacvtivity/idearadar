@@ -9,11 +9,9 @@ class IdeaDetailsScreen extends StatelessWidget {
   final Idea idea;
 
   Future<void> _editIdea(BuildContext context) async {
-    final updatedIdea = await Navigator.of(context).push<Idea>(
-      MaterialPageRoute(
-        builder: (_) => AddIdeaScreen(idea: idea),
-      ),
-    );
+    final updatedIdea = await Navigator.of(
+      context,
+    ).push<Idea>(MaterialPageRoute(builder: (_) => AddIdeaScreen(idea: idea)));
 
     if (!context.mounted || updatedIdea == null) {
       return;
