@@ -3,7 +3,12 @@ import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 
 class AddIdeaScreen extends StatefulWidget {
-  const AddIdeaScreen({super.key});
+  const AddIdeaScreen({
+    this.idea,
+    super.key,
+  });
+
+  final Idea? idea;
 
   @override
   State<AddIdeaScreen> createState() => _AddIdeaScreenState();
@@ -19,6 +24,23 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
 
   IdeaStatus _status = IdeaStatus.newIdea;
   bool _showValidationErrors = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final idea = widget.idea;
+    if (idea == null) {
+      return;
+    }
+
+    _titleController.text = idea.title;
+    _summaryController.text = idea.summary;
+    _problemController.text = idea.problem;
+    _solutionController.text = idea.solution;
+    _domainController.text = idea.domain;
+    _status = idea.status;
+  }
 
   @override
   void dispose() {
@@ -46,16 +68,22 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
     }
 
     final now = DateTime.now();
+    final originalIdea = widget.idea;
     final idea = Idea(
-      id: now.microsecondsSinceEpoch.toString(),
+      id: originalIdea?.id ?? now.microsecondsSinceEpoch.toString(),
       title: _titleController.text.trim(),
       summary: _summaryController.text.trim(),
       problem: _problemController.text.trim(),
       solution: _solutionController.text.trim(),
       domain: _domainController.text.trim(),
+      targetUsers: originalIdea?.targetUsers ?? '',
+      payingCustomer: originalIdea?.payingCustomer ?? '',
       status: _status,
-      createdAt: now,
+      evaluation: originalIdea?.evaluation,
+      createdAt: originalIdea?.createdAt ?? now,
       updatedAt: now,
+      nextReviewAt: originalIdea?.nextReviewAt,
+      archivedAt: originalIdea?.archivedAt,
     );
 
     Navigator.of(context).pop(idea);
@@ -70,8 +98,12 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.idea != null;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Add new idea')),
+      appBar: AppBar(
+        title: Text(isEditing ? 'Edit idea' : 'Add new idea'),
+      ),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: _dismissKeyboard,
@@ -86,14 +118,16 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
               children: [
                 Text(
-                  'Capture the opportunity',
+                  isEditing ? 'Update the opportunity' : 'Capture the opportunity',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Start with the problem. You can add evidence and scores later.',
+                  isEditing
+                      ? 'Keep the idea accurate as your research develops.'
+                      : 'Start with the problem. You can add evidence and scores later.',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -202,7 +236,7 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
           key: const Key('save_idea_button'),
           onPressed: _saveIdea,
           icon: const Icon(Icons.save_outlined),
-          label: const Text('Save idea'),
+          label: Text(isEditing ? 'Save changes' : 'Save idea'),
         ),
       ),
     );
