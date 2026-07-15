@@ -19,4 +19,14 @@ class InMemoryIdeaRepository implements IdeaRepository {
   Future<void> addIdea(Idea idea) async {
     _ideas.insert(0, idea);
   }
+
+  @override
+  Future<void> updateIdea(Idea idea) async {
+    final index = _ideas.indexWhere((current) => current.id == idea.id);
+    if (index == -1) {
+      throw StateError('Idea not found: ${idea.id}');
+    }
+
+    _ideas[index] = idea;
+  }
 }
