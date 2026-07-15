@@ -21,5 +21,15 @@ void main() {
     expect(ideas, hasLength(1));
     expect(ideas.single.id, 'idea-001');
     expect(ideas.single.title, 'IdeaRadar');
+
+    final updatedIdea = idea.copyWith(
+      title: 'Updated IdeaRadar',
+      updatedAt: DateTime(2026, 7, 16),
+    );
+    await repository.updateIdea(updatedIdea);
+
+    final updatedIdeas = await repository.getIdeas();
+    expect(updatedIdeas.single.id, 'idea-001');
+    expect(updatedIdeas.single.title, 'Updated IdeaRadar');
   });
 }
