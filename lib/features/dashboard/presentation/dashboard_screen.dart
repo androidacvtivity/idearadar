@@ -135,7 +135,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return;
     }
 
-    final selectedIdea = await showSearch<Idea>(
+    final selectedIdea = await showSearch<Idea?>(
       context: context,
       delegate: IdeaSearchDelegate(ideas: _ideas),
     );
