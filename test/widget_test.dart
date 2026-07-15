@@ -54,5 +54,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Mobile client portal'), findsOneWidget);
+
+    await tester.tap(find.text('Mobile client portal'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Idea details'), findsOneWidget);
+    expect(find.text('Business services'), findsOneWidget);
+    expect(find.text('New'), findsOneWidget);
+    expect(find.text('Not evaluated'), findsOneWidget);
   });
 }
