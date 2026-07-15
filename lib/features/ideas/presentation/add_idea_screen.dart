@@ -30,7 +30,13 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
     super.dispose();
   }
 
+  void _dismissKeyboard() {
+    FocusManager.instance.primaryFocus?.unfocus();
+  }
+
   void _saveIdea() {
+    _dismissKeyboard();
+
     setState(() {
       _showValidationErrors = true;
     });
@@ -66,13 +72,17 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Add new idea')),
-      body: SafeArea(
-        child: Form(
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _dismissKeyboard,
+        child: SafeArea(
+          child: Form(
           key: _formKey,
           autovalidateMode: _showValidationErrors
               ? AutovalidateMode.onUserInteraction
               : AutovalidateMode.disabled,
           child: ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
             children: [
               Text(
@@ -143,6 +153,7 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                 key: const Key('idea_summary_field'),
                 controller: _summaryController,
                 textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.next,
                 minLines: 2,
                 maxLines: 4,
                 decoration: const InputDecoration(
@@ -156,6 +167,7 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                 key: const Key('idea_problem_field'),
                 controller: _problemController,
                 textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.next,
                 minLines: 3,
                 maxLines: 6,
                 decoration: const InputDecoration(
@@ -169,6 +181,8 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                 key: const Key('idea_solution_field'),
                 controller: _solutionController,
                 textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => _dismissKeyboard(),
                 minLines: 3,
                 maxLines: 6,
                 decoration: const InputDecoration(
@@ -179,6 +193,7 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
               ),
             ],
           ),
+        ),
         ),
       ),
       bottomNavigationBar: SafeArea(
