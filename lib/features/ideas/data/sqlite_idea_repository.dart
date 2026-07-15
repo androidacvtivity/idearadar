@@ -36,6 +36,21 @@ class SqliteIdeaRepository implements IdeaRepository {
     );
   }
 
+  @override
+  Future<void> updateIdea(Idea idea) async {
+    final database = await _ideaDatabase.database;
+    final updatedRows = await database.update(
+      IdeaDatabase.ideasTable,
+      _ideaToMap(idea),
+      where: 'id = ?',
+      whereArgs: [idea.id],
+    );
+
+    if (updatedRows != 1) {
+      throw StateError('Idea not found: ${idea.id}');
+    }
+  }
+
   Map<String, Object?> _ideaToMap(Idea idea) {
     final evaluation = idea.evaluation;
 
