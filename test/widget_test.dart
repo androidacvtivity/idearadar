@@ -82,5 +82,24 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Updated mobile client portal'), findsOneWidget);
+
+    await tester.tap(find.text('Updated mobile client portal'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Not evaluated'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Evaluate idea'), findsOneWidget);
+    expect(find.text('24/40'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('save_evaluation_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('24/40'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    expect(find.text('24/40'), findsOneWidget);
   });
 }
