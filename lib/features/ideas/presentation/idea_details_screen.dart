@@ -1,11 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
+import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
 
 class IdeaDetailsScreen extends StatelessWidget {
   const IdeaDetailsScreen({required this.idea, super.key});
 
   final Idea idea;
+
+  Future<void> _editIdea(BuildContext context) async {
+    final updatedIdea = await Navigator.of(context).push<Idea>(
+      MaterialPageRoute(
+        builder: (_) => AddIdeaScreen(idea: idea),
+      ),
+    );
+
+    if (!context.mounted || updatedIdea == null) {
+      return;
+    }
+
+    Navigator.of(context).pop(updatedIdea);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +28,17 @@ class IdeaDetailsScreen extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Idea details')),
+      appBar: AppBar(
+        title: const Text('Idea details'),
+        actions: [
+          IconButton(
+            onPressed: () => _editIdea(context),
+            tooltip: 'Edit idea',
+            icon: const Icon(Icons.edit_outlined),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
