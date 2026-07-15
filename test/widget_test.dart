@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:idearadar/app/idea_radar_app.dart';
+import 'package:idearadar/features/ideas/data/in_memory_idea_repository.dart';
+
+Future<InMemoryIdeaRepository> pumpIdeaRadar(WidgetTester tester) async {
+  final repository = InMemoryIdeaRepository();
+  await tester.pumpWidget(IdeaRadarApp(repository: repository));
+  await tester.pumpAndSettle();
+  return repository;
+}
 
 void main() {
   testWidgets('shows the IdeaRadar dashboard', (tester) async {
-    await tester.pumpWidget(const IdeaRadarApp());
+    await pumpIdeaRadar(tester);
 
     expect(find.text('IdeaRadar'), findsOneWidget);
     expect(find.text('From idea to opportunity.'), findsOneWidget);
@@ -12,8 +20,8 @@ void main() {
     expect(find.text('New idea'), findsOneWidget);
   });
 
-  testWidgets('validates and adds a new idea', (tester) async {
-    await tester.pumpWidget(const IdeaRadarApp());
+  testWidgets('validates, adds, and reloads a new idea', (tester) async {
+    final repository = await pumpIdeaRadar(tester);
 
     await tester.tap(find.text('New idea'));
     await tester.pumpAndSettle();
@@ -40,5 +48,11 @@ void main() {
     expect(find.text('Mobile client portal'), findsOneWidget);
     expect(find.text('Business services · New'), findsOneWidget);
     expect(find.text('Your idea radar is ready'), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Mobile client portal'), findsOneWidget);
   });
 }
