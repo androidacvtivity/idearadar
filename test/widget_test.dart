@@ -62,5 +62,25 @@ void main() {
     expect(find.text('Business services'), findsOneWidget);
     expect(find.text('New'), findsOneWidget);
     expect(find.text('Not evaluated'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Edit idea'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit idea'), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const Key('idea_title_field')),
+      'Updated mobile client portal',
+    );
+    await tester.tap(find.byKey(const Key('save_idea_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Updated mobile client portal'), findsOneWidget);
+    expect(find.text('Mobile client portal'), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Updated mobile client portal'), findsOneWidget);
   });
 }
