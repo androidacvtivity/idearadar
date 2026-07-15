@@ -14,15 +14,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Idea> _ideas = [];
 
   int get _validatedIdeas {
-    return _ideas
-        .where((idea) => idea.status == IdeaStatus.validated)
-        .length;
+    return _ideas.where((idea) => idea.status == IdeaStatus.validated).length;
   }
 
   Future<void> _addIdea() async {
-    final idea = await Navigator.of(context).push<Idea>(
-      MaterialPageRoute(builder: (_) => const AddIdeaScreen()),
-    );
+    final idea = await Navigator.of(
+      context,
+    ).push<Idea>(MaterialPageRoute(builder: (_) => const AddIdeaScreen()));
 
     if (!mounted || idea == null) {
       return;
@@ -158,11 +156,7 @@ class _EmptyState extends StatelessWidget {
         padding: const EdgeInsets.all(28),
         child: Column(
           children: [
-            Icon(
-              Icons.explore_outlined,
-              size: 48,
-              color: colorScheme.primary,
-            ),
+            Icon(Icons.explore_outlined, size: 48, color: colorScheme.primary),
             const SizedBox(height: 16),
             Text(
               'Your idea radar is ready',
@@ -204,10 +198,7 @@ class _IdeaCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 8,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         leading: CircleAvatar(
           backgroundColor: colorScheme.primaryContainer,
           foregroundColor: colorScheme.onPrimaryContainer,
