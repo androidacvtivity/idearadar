@@ -237,7 +237,8 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                   maxLines: 4,
                   decoration: const InputDecoration(
                     labelText: 'Target users',
-                    hintText: 'Who experiences the problem and uses the solution?',
+                    hintText:
+                        'Who experiences the problem and uses the solution?',
                     prefixIcon: Icon(Icons.groups_outlined),
                     alignLabelWithHint: true,
                   ),
