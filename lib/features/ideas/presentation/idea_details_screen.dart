@@ -6,6 +6,7 @@ import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_details_result.dart';
 import 'package:idearadar/features/ideas/presentation/idea_evaluation_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_notes_screen.dart';
+import 'package:idearadar/features/ideas/presentation/idea_sources_screen.dart';
 
 class IdeaDetailsScreen extends StatelessWidget {
   const IdeaDetailsScreen({
@@ -195,6 +196,28 @@ class IdeaDetailsScreen extends StatelessWidget {
                 ),
                 title: const Text('Research notes'),
                 subtitle: const Text('Record assumptions and findings'),
+                trailing: const Icon(Icons.chevron_right),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                key: const Key('research_sources_tile'),
+                onTap: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (_) => IdeaSourcesScreen(
+                      repository: repository,
+                      ideaId: idea.id,
+                    ),
+                  ),
+                ),
+                leading: CircleAvatar(
+                  backgroundColor: colorScheme.secondaryContainer,
+                  foregroundColor: colorScheme.onSecondaryContainer,
+                  child: const Icon(Icons.travel_explore),
+                ),
+                title: const Text('Research sources'),
+                subtitle: const Text('Attach links, reports, and interviews'),
                 trailing: const Icon(Icons.chevron_right),
               ),
             ),
