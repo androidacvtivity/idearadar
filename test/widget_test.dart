@@ -262,7 +262,6 @@ void main() {
     expect(find.text('3 of 3'), findsOneWidget);
   });
 
-
   testWidgets('schedules and clears the next review date', (tester) async {
     final now = DateTime.now();
     final repository = InMemoryIdeaRepository(
@@ -306,5 +305,4 @@ void main() {
     expect(savedIdea.nextReviewAt, isNull);
     expect(find.textContaining('Review '), findsNothing);
   });
-
 }
