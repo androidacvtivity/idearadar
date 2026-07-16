@@ -18,6 +18,8 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
   final _problemController = TextEditingController();
   final _solutionController = TextEditingController();
   final _domainController = TextEditingController();
+  final _targetUsersController = TextEditingController();
+  final _payingCustomerController = TextEditingController();
 
   IdeaStatus _status = IdeaStatus.newIdea;
   bool _showValidationErrors = false;
@@ -36,6 +38,8 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
     _problemController.text = idea.problem;
     _solutionController.text = idea.solution;
     _domainController.text = idea.domain;
+    _targetUsersController.text = idea.targetUsers;
+    _payingCustomerController.text = idea.payingCustomer;
     _status = idea.status;
   }
 
@@ -46,6 +50,8 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
     _problemController.dispose();
     _solutionController.dispose();
     _domainController.dispose();
+    _targetUsersController.dispose();
+    _payingCustomerController.dispose();
     super.dispose();
   }
 
@@ -73,8 +79,8 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
       problem: _problemController.text.trim(),
       solution: _solutionController.text.trim(),
       domain: _domainController.text.trim(),
-      targetUsers: originalIdea?.targetUsers ?? '',
-      payingCustomer: originalIdea?.payingCustomer ?? '',
+      targetUsers: _targetUsersController.text.trim(),
+      payingCustomer: _payingCustomerController.text.trim(),
       status: _status,
       evaluation: originalIdea?.evaluation,
       createdAt: originalIdea?.createdAt ?? now,
@@ -212,13 +218,43 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                   key: const Key('idea_solution_field'),
                   controller: _solutionController,
                   textCapitalization: TextCapitalization.sentences,
-                  textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_) => _dismissKeyboard(),
+                  textInputAction: TextInputAction.next,
                   minLines: 3,
                   maxLines: 6,
                   decoration: const InputDecoration(
                     labelText: 'Proposed solution',
                     hintText: 'How could the problem be solved?',
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  key: const Key('idea_target_users_field'),
+                  controller: _targetUsersController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.next,
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    labelText: 'Target users',
+                    hintText: 'Who experiences the problem and uses the solution?',
+                    prefixIcon: Icon(Icons.groups_outlined),
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  key: const Key('idea_paying_customer_field'),
+                  controller: _payingCustomerController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _dismissKeyboard(),
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    labelText: 'Paying customer',
+                    hintText: 'Who decides to buy or fund the solution?',
+                    prefixIcon: Icon(Icons.payments_outlined),
                     alignLabelWithHint: true,
                   ),
                 ),
