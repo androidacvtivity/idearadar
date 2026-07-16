@@ -269,12 +269,10 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              widget.note == null
-                  ? 'New research note'
-                  : 'Edit research note',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              widget.note == null ? 'New research note' : 'Edit research note',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -295,9 +293,7 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
               key: const Key('save_note_button'),
               onPressed: _save,
               icon: const Icon(Icons.save_outlined),
-              label: Text(
-                widget.note == null ? 'Save note' : 'Save changes',
-              ),
+              label: Text(widget.note == null ? 'Save note' : 'Save changes'),
             ),
           ],
         ),
@@ -327,9 +323,9 @@ class _EmptyNotes extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'No research notes yet',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             const Text(
