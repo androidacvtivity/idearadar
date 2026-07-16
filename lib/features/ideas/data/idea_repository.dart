@@ -1,5 +1,6 @@
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
+import 'package:idearadar/features/ideas/domain/idea_source.dart';
 
 abstract interface class IdeaRepository {
   Future<void> initialize();
@@ -19,4 +20,12 @@ abstract interface class IdeaRepository {
   Future<void> updateNote(IdeaNote note);
 
   Future<void> deleteNote(String noteId);
+
+  Future<List<IdeaSource>> getSources(String ideaId);
+
+  Future<void> addSource(IdeaSource source);
+
+  Future<void> updateSource(IdeaSource source);
+
+  Future<void> deleteSource(String sourceId);
 }
