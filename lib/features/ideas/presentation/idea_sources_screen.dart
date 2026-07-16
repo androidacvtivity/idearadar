@@ -54,10 +54,8 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
   Future<void> _openEditor([IdeaSource? source]) async {
     final savedSource = await Navigator.of(context).push<IdeaSource>(
       MaterialPageRoute(
-        builder: (_) => _SourceEditorScreen(
-          ideaId: widget.ideaId,
-          source: source,
-        ),
+        builder: (_) =>
+            _SourceEditorScreen(ideaId: widget.ideaId, source: source),
       ),
     );
 
@@ -219,10 +217,7 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
 }
 
 class _SourceEditorScreen extends StatefulWidget {
-  const _SourceEditorScreen({
-    required this.ideaId,
-    this.source,
-  });
+  const _SourceEditorScreen({required this.ideaId, this.source});
 
   final String ideaId;
   final IdeaSource? source;
@@ -448,9 +443,9 @@ class _EmptySources extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'No research sources yet',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             const Text(

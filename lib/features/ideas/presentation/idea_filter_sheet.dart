@@ -56,9 +56,9 @@ class _IdeaFilterSheetState extends State<IdeaFilterSheet> {
               children: [
                 Text(
                   'Filter and sort',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const Spacer(),
                 TextButton(
@@ -99,10 +99,7 @@ class _IdeaFilterSheetState extends State<IdeaFilterSheet> {
                 prefixIcon: Icon(Icons.analytics_outlined),
               ),
               items: const [
-                DropdownMenuItem<int?>(
-                  value: null,
-                  child: Text('Any score'),
-                ),
+                DropdownMenuItem<int?>(value: null, child: Text('Any score')),
                 DropdownMenuItem(value: 20, child: Text('20 or higher')),
                 DropdownMenuItem(value: 25, child: Text('25 or higher')),
                 DropdownMenuItem(value: 30, child: Text('30 or higher')),
@@ -120,10 +117,8 @@ class _IdeaFilterSheetState extends State<IdeaFilterSheet> {
               ),
               items: IdeaSort.values
                   .map(
-                    (sort) => DropdownMenuItem(
-                      value: sort,
-                      child: Text(sort.label),
-                    ),
+                    (sort) =>
+                        DropdownMenuItem(value: sort, child: Text(sort.label)),
                   )
                   .toList(),
               onChanged: (sort) {

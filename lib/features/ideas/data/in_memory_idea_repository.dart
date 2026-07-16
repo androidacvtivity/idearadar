@@ -86,9 +86,7 @@ class InMemoryIdeaRepository implements IdeaRepository {
 
   @override
   Future<List<IdeaSource>> getSources(String ideaId) async {
-    final sources = _sources
-        .where((source) => source.ideaId == ideaId)
-        .toList()
+    final sources = _sources.where((source) => source.ideaId == ideaId).toList()
       ..sort((a, b) => b.accessedAt.compareTo(a.accessedAt));
     return List<IdeaSource>.unmodifiable(sources);
   }

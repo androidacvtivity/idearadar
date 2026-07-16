@@ -136,10 +136,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _openIdea(Idea idea) async {
     final result = await Navigator.of(context).push<IdeaDetailsResult>(
       MaterialPageRoute(
-        builder: (_) => IdeaDetailsScreen(
-          idea: idea,
-          repository: widget.repository,
-        ),
+        builder: (_) =>
+            IdeaDetailsScreen(idea: idea, repository: widget.repository),
       ),
     );
 

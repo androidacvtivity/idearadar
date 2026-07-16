@@ -15,10 +15,7 @@ class IdeaNote {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  IdeaNote copyWith({
-    String? content,
-    DateTime? updatedAt,
-  }) {
+  IdeaNote copyWith({String? content, DateTime? updatedAt}) {
     return IdeaNote(
       id: id,
       ideaId: ideaId,

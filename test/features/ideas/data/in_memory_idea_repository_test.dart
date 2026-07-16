@@ -49,7 +49,10 @@ void main() {
       updatedAt: DateTime(2026, 7, 16),
     );
     await repository.updateNote(updatedNote);
-    expect((await repository.getNotes(idea.id)).single.content, contains('Validated'));
+    expect(
+      (await repository.getNotes(idea.id)).single.content,
+      contains('Validated'),
+    );
 
     final source = IdeaSource(
       id: 'source-001',
