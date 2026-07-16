@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:idearadar/app/idea_radar_app.dart';
 import 'package:idearadar/features/ideas/data/in_memory_idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
+import 'package:idearadar/features/ideas/domain/idea_evaluation.dart';
+import 'package:idearadar/features/ideas/domain/idea_status.dart';
 
 Future<InMemoryIdeaRepository> pumpIdeaRadar(WidgetTester tester) async {
   final repository = InMemoryIdeaRepository();
@@ -175,4 +177,86 @@ void main() {
 
     expect(find.text('Idea to delete'), findsNothing);
   });
+
+  testWidgets('filters by status and sorts ideas by score', (tester) async {
+    final now = DateTime(2026, 7, 16);
+    IdeaEvaluation evaluation(int score) {
+      return IdeaEvaluation(
+        problemScore: score,
+        marketScore: score,
+        demandScore: score,
+        competitionScore: score,
+        dataAccessScore: score,
+        technicalFeasibilityScore: score,
+        monetizationScore: score,
+        firstClientScore: score,
+      );
+    }
+
+    final repository = InMemoryIdeaRepository(
+      seedIdeas: [
+        Idea(
+          id: 'high-score',
+          title: 'High scoring validated idea',
+          domain: 'Education',
+          status: IdeaStatus.validated,
+          evaluation: evaluation(5),
+          createdAt: now,
+          updatedAt: now,
+        ),
+        Idea(
+          id: 'medium-score',
+          title: 'Medium scoring research idea',
+          domain: 'Agriculture',
+          status: IdeaStatus.researching,
+          evaluation: evaluation(3),
+          createdAt: now.subtract(const Duration(days: 1)),
+          updatedAt: now.subtract(const Duration(days: 1)),
+        ),
+        Idea(
+          id: 'not-evaluated',
+          title: 'New unevaluated idea',
+          domain: 'Community',
+          createdAt: now.subtract(const Duration(days: 2)),
+          updatedAt: now.subtract(const Duration(days: 2)),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Filter and sort ideas'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('idea_status_filter')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Validated').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('apply_idea_filters_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('High scoring validated idea'), findsOneWidget);
+    expect(find.text('Medium scoring research idea'), findsNothing);
+    expect(find.text('1 of 3'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Filter and sort ideas'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('reset_idea_filters_button')));
+    await tester.tap(find.byKey(const Key('idea_sort_field')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Highest score').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('apply_idea_filters_button')));
+    await tester.pumpAndSettle();
+
+    final highPosition = tester.getTopLeft(
+      find.text('High scoring validated idea'),
+    );
+    final mediumPosition = tester.getTopLeft(
+      find.text('Medium scoring research idea'),
+    );
+    expect(highPosition.dy, lessThan(mediumPosition.dy));
+    expect(find.text('3 of 3'), findsOneWidget);
+  });
+
 }
