@@ -531,8 +531,10 @@ class _IdeaCard extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         subtitle: Text(
-          '${idea.domain} · ${idea.status.label}',
-          maxLines: 1,
+          idea.nextReviewAt == null
+              ? '${idea.domain} · ${idea.status.label}'
+              : '${idea.domain} · ${idea.status.label}\nReview ${_formatReviewDate(idea.nextReviewAt!)}',
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
         trailing: idea.totalScore == null
@@ -543,6 +545,12 @@ class _IdeaCard extends StatelessWidget {
               ),
       ),
     );
+  }
+
+  static String _formatReviewDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return '$day.$month.${date.year}';
   }
 }
 
