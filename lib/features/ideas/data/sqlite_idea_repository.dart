@@ -2,6 +2,8 @@ import 'package:idearadar/features/ideas/data/idea_database.dart';
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_evaluation.dart';
+import 'package:idearadar/features/ideas/domain/idea_note.dart';
+import 'package:idearadar/features/ideas/domain/idea_source.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -63,6 +65,145 @@ class SqliteIdeaRepository implements IdeaRepository {
     if (deletedRows != 1) {
       throw StateError('Idea not found: $ideaId');
     }
+  }
+
+  @override
+  Future<List<IdeaNote>> getNotes(String ideaId) async {
+    final database = await _ideaDatabase.database;
+    final records = await database.query(
+      IdeaDatabase.notesTable,
+      where: 'idea_id = ?',
+      whereArgs: [ideaId],
+      orderBy: 'updated_at DESC',
+    );
+    return records.map(_noteFromMap).toList(growable: false);
+  }
+
+  @override
+  Future<void> addNote(IdeaNote note) async {
+    final database = await _ideaDatabase.database;
+    await database.insert(IdeaDatabase.notesTable, _noteToMap(note));
+  }
+
+  @override
+  Future<void> updateNote(IdeaNote note) async {
+    final database = await _ideaDatabase.database;
+    final updatedRows = await database.update(
+      IdeaDatabase.notesTable,
+      _noteToMap(note),
+      where: 'id = ?',
+      whereArgs: [note.id],
+    );
+    if (updatedRows != 1) {
+      throw StateError('Note not found: ${note.id}');
+    }
+  }
+
+  @override
+  Future<void> deleteNote(String noteId) async {
+    final database = await _ideaDatabase.database;
+    final deletedRows = await database.delete(
+      IdeaDatabase.notesTable,
+      where: 'id = ?',
+      whereArgs: [noteId],
+    );
+    if (deletedRows != 1) {
+      throw StateError('Note not found: $noteId');
+    }
+  }
+
+  @override
+  Future<List<IdeaSource>> getSources(String ideaId) async {
+    final database = await _ideaDatabase.database;
+    final records = await database.query(
+      IdeaDatabase.sourcesTable,
+      where: 'idea_id = ?',
+      whereArgs: [ideaId],
+      orderBy: 'accessed_at DESC',
+    );
+    return records.map(_sourceFromMap).toList(growable: false);
+  }
+
+  @override
+  Future<void> addSource(IdeaSource source) async {
+    final database = await _ideaDatabase.database;
+    await database.insert(IdeaDatabase.sourcesTable, _sourceToMap(source));
+  }
+
+  @override
+  Future<void> updateSource(IdeaSource source) async {
+    final database = await _ideaDatabase.database;
+    final updatedRows = await database.update(
+      IdeaDatabase.sourcesTable,
+      _sourceToMap(source),
+      where: 'id = ?',
+      whereArgs: [source.id],
+    );
+    if (updatedRows != 1) {
+      throw StateError('Source not found: ${source.id}');
+    }
+  }
+
+  @override
+  Future<void> deleteSource(String sourceId) async {
+    final database = await _ideaDatabase.database;
+    final deletedRows = await database.delete(
+      IdeaDatabase.sourcesTable,
+      where: 'id = ?',
+      whereArgs: [sourceId],
+    );
+    if (deletedRows != 1) {
+      throw StateError('Source not found: $sourceId');
+    }
+  }
+
+  Map<String, Object?> _sourceToMap(IdeaSource source) {
+    return {
+      'id': source.id,
+      'idea_id': source.ideaId,
+      'title': source.title,
+      'url': source.url,
+      'source_type': source.sourceType.name,
+      'note': source.note,
+      'accessed_at': source.accessedAt.toIso8601String(),
+      'created_at': source.createdAt.toIso8601String(),
+    };
+  }
+
+  IdeaSource _sourceFromMap(Map<String, Object?> map) {
+    return IdeaSource(
+      id: map['id']! as String,
+      ideaId: map['idea_id']! as String,
+      title: map['title']! as String,
+      url: map['url']! as String,
+      sourceType: IdeaSourceType.values.firstWhere(
+        (type) => type.name == map['source_type'],
+        orElse: () => IdeaSourceType.other,
+      ),
+      note: map['note']! as String,
+      accessedAt: DateTime.parse(map['accessed_at']! as String),
+      createdAt: DateTime.parse(map['created_at']! as String),
+    );
+  }
+
+  Map<String, Object?> _noteToMap(IdeaNote note) {
+    return {
+      'id': note.id,
+      'idea_id': note.ideaId,
+      'content': note.content,
+      'created_at': note.createdAt.toIso8601String(),
+      'updated_at': note.updatedAt.toIso8601String(),
+    };
+  }
+
+  IdeaNote _noteFromMap(Map<String, Object?> map) {
+    return IdeaNote(
+      id: map['id']! as String,
+      ideaId: map['idea_id']! as String,
+      content: map['content']! as String,
+      createdAt: DateTime.parse(map['created_at']! as String),
+      updatedAt: DateTime.parse(map['updated_at']! as String),
+    );
   }
 
   Map<String, Object?> _ideaToMap(Idea idea) {
