@@ -1,16 +1,20 @@
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
+import 'package:idearadar/features/ideas/domain/idea_source.dart';
 
 class InMemoryIdeaRepository implements IdeaRepository {
   InMemoryIdeaRepository({
     List<Idea> seedIdeas = const [],
     List<IdeaNote> seedNotes = const [],
+    List<IdeaSource> seedSources = const [],
   }) : _ideas = List<Idea>.from(seedIdeas),
-       _notes = List<IdeaNote>.from(seedNotes);
+       _notes = List<IdeaNote>.from(seedNotes),
+       _sources = List<IdeaSource>.from(seedSources);
 
   final List<Idea> _ideas;
   final List<IdeaNote> _notes;
+  final List<IdeaSource> _sources;
 
   @override
   Future<void> initialize() async {}
@@ -44,6 +48,7 @@ class InMemoryIdeaRepository implements IdeaRepository {
 
     _ideas.removeWhere((idea) => idea.id == ideaId);
     _notes.removeWhere((note) => note.ideaId == ideaId);
+    _sources.removeWhere((source) => source.ideaId == ideaId);
   }
 
   @override
@@ -77,5 +82,42 @@ class InMemoryIdeaRepository implements IdeaRepository {
       throw StateError('Note not found: $noteId');
     }
     _notes.removeWhere((note) => note.id == noteId);
+  }
+
+  @override
+  Future<List<IdeaSource>> getSources(String ideaId) async {
+    final sources = _sources
+        .where((source) => source.ideaId == ideaId)
+        .toList()
+      ..sort((a, b) => b.accessedAt.compareTo(a.accessedAt));
+    return List<IdeaSource>.unmodifiable(sources);
+  }
+
+  @override
+  Future<void> addSource(IdeaSource source) async {
+    if (!_ideas.any((idea) => idea.id == source.ideaId)) {
+      throw StateError('Idea not found: ${source.ideaId}');
+    }
+    _sources.insert(0, source);
+  }
+
+  @override
+  Future<void> updateSource(IdeaSource source) async {
+    final index = _sources.indexWhere((current) => current.id == source.id);
+    if (index == -1) {
+      throw StateError('Source not found: ${source.id}');
+    }
+    _sources[index] = source;
+  }
+
+  @override
+  Future<void> deleteSource(String sourceId) async {
+    final removedSources = _sources
+        .where((source) => source.id == sourceId)
+        .length;
+    if (removedSources != 1) {
+      throw StateError('Source not found: $sourceId');
+    }
+    _sources.removeWhere((source) => source.id == sourceId);
   }
 }
