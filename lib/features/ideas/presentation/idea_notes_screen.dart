@@ -54,63 +54,11 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
   }
 
   Future<void> _openNoteEditor([IdeaNote? note]) async {
-    final controller = TextEditingController(text: note?.content);
     final content = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
-      builder: (sheetContext) {
-        return Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            20,
-            20,
-            MediaQuery.viewInsetsOf(sheetContext).bottom + 20,
-          ),
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  note == null ? 'New research note' : 'Edit research note',
-                  style: Theme.of(sheetContext).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  key: const Key('note_content_field'),
-                  controller: controller,
-                  autofocus: true,
-                  minLines: 4,
-                  maxLines: 8,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Note',
-                    hintText: 'Add an observation, assumption, or research finding',
-                    alignLabelWithHint: true,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                FilledButton.icon(
-                  key: const Key('save_note_button'),
-                  onPressed: () {
-                    final value = controller.text.trim();
-                    if (value.isNotEmpty) {
-                      Navigator.of(sheetContext).pop(value);
-                    }
-                  },
-                  icon: const Icon(Icons.save_outlined),
-                  label: Text(note == null ? 'Save note' : 'Save changes'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (_) => _NoteEditorSheet(note: note),
     );
-    controller.dispose();
 
     if (!mounted || content == null) {
       return;
@@ -271,6 +219,90 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
     final hour = date.hour.toString().padLeft(2, '0');
     final minute = date.minute.toString().padLeft(2, '0');
     return '$day.$month.${date.year} · $hour:$minute';
+  }
+}
+
+class _NoteEditorSheet extends StatefulWidget {
+  const _NoteEditorSheet({this.note});
+
+  final IdeaNote? note;
+
+  @override
+  State<_NoteEditorSheet> createState() => _NoteEditorSheetState();
+}
+
+class _NoteEditorSheetState extends State<_NoteEditorSheet> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.note?.content);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final value = _controller.text.trim();
+    if (value.isNotEmpty) {
+      Navigator.of(context).pop(value);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        20,
+        20,
+        MediaQuery.viewInsetsOf(context).bottom + 20,
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              widget.note == null
+                  ? 'New research note'
+                  : 'Edit research note',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              key: const Key('note_content_field'),
+              controller: _controller,
+              autofocus: true,
+              minLines: 4,
+              maxLines: 8,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(
+                labelText: 'Note',
+                hintText: 'Add an observation, assumption, or research finding',
+                alignLabelWithHint: true,
+              ),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              key: const Key('save_note_button'),
+              onPressed: _save,
+              icon: const Icon(Icons.save_outlined),
+              label: Text(
+                widget.note == null ? 'Save note' : 'Save changes',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
