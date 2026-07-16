@@ -7,7 +7,7 @@
 - [x] Display name set to `IdeaRadar`
 - [x] First release targets iPhone
 - [x] Non-exempt encryption declaration set to false
-- [ ] Replace the default Flutter app icon
+- [x] Replace the default Flutter app icon
 - [ ] Run `dart format --output=none --set-exit-if-changed lib test`
 - [ ] Run `flutter analyze`
 - [ ] Run `flutter test`
