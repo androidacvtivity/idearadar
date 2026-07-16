@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_details_result.dart';
 import 'package:idearadar/features/ideas/presentation/idea_evaluation_screen.dart';
+import 'package:idearadar/features/ideas/presentation/idea_notes_screen.dart';
 
 class IdeaDetailsScreen extends StatelessWidget {
-  const IdeaDetailsScreen({required this.idea, super.key});
+  const IdeaDetailsScreen({
+    required this.idea,
+    required this.repository,
+    super.key,
+  });
 
   final Idea idea;
+  final IdeaRepository repository;
 
   Future<void> _editIdea(BuildContext context) async {
     final updatedIdea = await Navigator.of(
@@ -166,6 +173,28 @@ class IdeaDetailsScreen extends StatelessWidget {
                       ? 'Not evaluated'
                       : '${idea.totalScore} out of 40',
                 ),
+                trailing: const Icon(Icons.chevron_right),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                key: const Key('research_notes_tile'),
+                onTap: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (_) => IdeaNotesScreen(
+                      repository: repository,
+                      ideaId: idea.id,
+                    ),
+                  ),
+                ),
+                leading: CircleAvatar(
+                  backgroundColor: colorScheme.tertiaryContainer,
+                  foregroundColor: colorScheme.onTertiaryContainer,
+                  child: const Icon(Icons.sticky_note_2_outlined),
+                ),
+                title: const Text('Research notes'),
+                subtitle: const Text('Record assumptions and findings'),
                 trailing: const Icon(Icons.chevron_right),
               ),
             ),
