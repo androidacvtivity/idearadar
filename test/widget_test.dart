@@ -322,4 +322,60 @@ void main() {
     expect(savedIdea.nextReviewAt, isNull);
     expect(find.textContaining('Review '), findsNothing);
   });
+
+  testWidgets('archives and restores an idea', (tester) async {
+    final now = DateTime(2026, 7, 16);
+    final repository = InMemoryIdeaRepository(
+      seedIdeas: [
+        Idea(
+          id: 'idea-archive',
+          title: 'Idea to archive',
+          domain: 'Planning',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Idea to archive'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('More actions'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Archive idea'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Archive idea?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Archive'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Idea to archive'), findsNothing);
+    expect((await repository.getIdeas()).single.isArchived, isTrue);
+
+    await tester.tap(find.byTooltip('Archived ideas'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Idea to archive'), findsOneWidget);
+    await tester.tap(find.text('Idea to archive'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('More actions'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Restore idea'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restore idea?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Restore'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No archived ideas'), findsOneWidget);
+    expect((await repository.getIdeas()).single.isArchived, isFalse);
+
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Idea to archive'), findsOneWidget);
+  });
+
 }
