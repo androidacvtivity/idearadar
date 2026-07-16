@@ -3,6 +3,7 @@ import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
+import 'package:idearadar/features/ideas/presentation/archived_ideas_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_details_result.dart';
 import 'package:idearadar/features/ideas/presentation/idea_details_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_filter_sheet.dart';
@@ -62,12 +63,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  List<Idea> get _activeIdeas =>
+      _ideas.where((idea) => !idea.isArchived).toList(growable: false);
+
+  List<Idea> get _archivedIdeas =>
+      _ideas.where((idea) => idea.isArchived).toList(growable: false);
+
   int get _validatedIdeas {
-    return _ideas.where((idea) => idea.status == IdeaStatus.validated).length;
+    return _activeIdeas
+        .where((idea) => idea.status == IdeaStatus.validated)
+        .length;
   }
 
   List<Idea> get _visibleIdeas {
-    final visibleIdeas = _ideas.where((idea) {
+    final visibleIdeas = _activeIdeas.where((idea) {
       final statusMatches =
           _listOptions.status == null || idea.status == _listOptions.status;
       final minimumScore = _listOptions.minimumScore;
@@ -206,6 +215,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Future<void> _openArchive() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => ArchivedIdeasScreen(repository: widget.repository),
+      ),
+    );
+
+    if (mounted) {
+      await _loadIdeas();
+    }
+  }
+
   Future<void> _openFilters() async {
     final options = await showModalBottomSheet<IdeaListOptions>(
       context: context,
@@ -225,16 +246,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _searchIdeas() async {
-    if (_ideas.isEmpty) {
+    final activeIdeas = _activeIdeas;
+    if (activeIdeas.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add an idea before searching.')),
+        const SnackBar(content: Text('Add an active idea before searching.')),
       );
       return;
     }
 
     final selectedIdea = await showSearch<Idea?>(
       context: context,
-      delegate: IdeaSearchDelegate(ideas: _ideas),
+      delegate: IdeaSearchDelegate(ideas: activeIdeas),
     );
 
     if (!mounted || selectedIdea == null) {
@@ -248,6 +270,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final activeIdeas = _activeIdeas;
+    final archivedIdeas = _archivedIdeas;
     final visibleIdeas = _visibleIdeas;
 
     return Scaffold(
@@ -258,7 +282,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: _isLoading || _ideas.isEmpty ? null : _openFilters,
+            onPressed: _isLoading ? null : _openArchive,
+            tooltip: 'Archived ideas',
+            icon: archivedIdeas.isEmpty
+                ? const Icon(Icons.archive_outlined)
+                : Badge.count(
+                    count: archivedIdeas.length,
+                    child: const Icon(Icons.archive_outlined),
+                  ),
+          ),
+          IconButton(
+            onPressed: _isLoading || activeIdeas.isEmpty ? null : _openFilters,
             tooltip: 'Filter and sort ideas',
             icon: _listOptions.activeFilterCount == 0
                 ? const Icon(Icons.tune)
@@ -324,7 +358,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: _SummaryCard(
                     label: 'All ideas',
-                    value: '${_ideas.length}',
+                    value: '${activeIdeas.length}',
                     icon: Icons.lightbulb_outline,
                     color: colorScheme.primary,
                   ),
@@ -350,7 +384,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               )
             else if (_loadError != null)
               _LoadError(message: _loadError!, onRetry: _loadIdeas)
-            else if (_ideas.isEmpty)
+            else if (activeIdeas.isEmpty)
               _EmptyState(onAddIdea: _addIdea)
             else ...[
               Row(
@@ -363,7 +397,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const Spacer(),
                   Text(
-                    '${visibleIdeas.length} of ${_ideas.length}',
+                    '${visibleIdeas.length} of ${activeIdeas.length}',
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
