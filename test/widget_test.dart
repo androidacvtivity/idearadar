@@ -45,17 +45,14 @@ void main() {
       find.byKey(const Key('idea_domain_field')),
       'Business services',
     );
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('idea_target_users_field')),
-      200,
+    await tester.drag(
+      find.byType(ListView),
+      const Offset(0, -700),
     );
+    await tester.pumpAndSettle();
     await tester.enterText(
       find.byKey(const Key('idea_target_users_field')),
       'Small business owners and their staff',
-    );
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('idea_paying_customer_field')),
-      200,
     );
     await tester.enterText(
       find.byKey(const Key('idea_paying_customer_field')),
