@@ -3,8 +3,9 @@ import 'package:sqflite/sqflite.dart';
 
 class IdeaDatabase {
   static const databaseName = 'idearadar.db';
-  static const databaseVersion = 1;
+  static const databaseVersion = 2;
   static const ideasTable = 'ideas';
+  static const notesTable = 'idea_notes';
 
   Database? _database;
 
@@ -19,35 +20,61 @@ class IdeaDatabase {
     _database = await openDatabase(
       databasePath,
       version: databaseVersion,
+      onConfigure: (database) async {
+        await database.execute('PRAGMA foreign_keys = ON');
+      },
       onCreate: (database, version) async {
-        await database.execute('''
-          CREATE TABLE $ideasTable (
-            id TEXT PRIMARY KEY,
-            title TEXT NOT NULL,
-            summary TEXT NOT NULL DEFAULT '',
-            problem TEXT NOT NULL DEFAULT '',
-            solution TEXT NOT NULL DEFAULT '',
-            domain TEXT NOT NULL DEFAULT '',
-            target_users TEXT NOT NULL DEFAULT '',
-            paying_customer TEXT NOT NULL DEFAULT '',
-            status TEXT NOT NULL,
-            problem_score INTEGER,
-            market_score INTEGER,
-            demand_score INTEGER,
-            competition_score INTEGER,
-            data_access_score INTEGER,
-            technical_feasibility_score INTEGER,
-            monetization_score INTEGER,
-            first_client_score INTEGER,
-            evaluation_rationale TEXT,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL,
-            next_review_at TEXT,
-            archived_at TEXT
-          )
-        ''');
+        await _createIdeasTable(database);
+        await _createNotesTable(database);
+      },
+      onUpgrade: (database, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await _createNotesTable(database);
+        }
       },
     );
+  }
+
+  static Future<void> _createIdeasTable(Database database) {
+    return database.execute('''
+      CREATE TABLE $ideasTable (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        summary TEXT NOT NULL DEFAULT '',
+        problem TEXT NOT NULL DEFAULT '',
+        solution TEXT NOT NULL DEFAULT '',
+        domain TEXT NOT NULL DEFAULT '',
+        target_users TEXT NOT NULL DEFAULT '',
+        paying_customer TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL,
+        problem_score INTEGER,
+        market_score INTEGER,
+        demand_score INTEGER,
+        competition_score INTEGER,
+        data_access_score INTEGER,
+        technical_feasibility_score INTEGER,
+        monetization_score INTEGER,
+        first_client_score INTEGER,
+        evaluation_rationale TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        next_review_at TEXT,
+        archived_at TEXT
+      )
+    ''');
+  }
+
+  static Future<void> _createNotesTable(Database database) {
+    return database.execute('''
+      CREATE TABLE $notesTable (
+        id TEXT PRIMARY KEY,
+        idea_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (idea_id) REFERENCES $ideasTable (id) ON DELETE CASCADE
+      )
+    ''');
   }
 
   Future<Database> get database async {
