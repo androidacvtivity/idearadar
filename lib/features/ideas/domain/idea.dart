@@ -51,6 +51,7 @@ class Idea {
     IdeaEvaluation? evaluation,
     DateTime? updatedAt,
     DateTime? nextReviewAt,
+    bool clearNextReviewAt = false,
     DateTime? archivedAt,
   }) {
     return Idea(
@@ -66,7 +67,9 @@ class Idea {
       evaluation: evaluation ?? this.evaluation,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      nextReviewAt: nextReviewAt ?? this.nextReviewAt,
+      nextReviewAt: clearNextReviewAt
+          ? null
+          : nextReviewAt ?? this.nextReviewAt,
       archivedAt: archivedAt ?? this.archivedAt,
     );
   }
