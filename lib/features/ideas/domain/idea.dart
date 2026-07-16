@@ -53,6 +53,7 @@ class Idea {
     DateTime? nextReviewAt,
     bool clearNextReviewAt = false,
     DateTime? archivedAt,
+    bool clearArchivedAt = false,
   }) {
     return Idea(
       id: id,
@@ -70,7 +71,7 @@ class Idea {
       nextReviewAt: clearNextReviewAt
           ? null
           : nextReviewAt ?? this.nextReviewAt,
-      archivedAt: archivedAt ?? this.archivedAt,
+      archivedAt: clearArchivedAt ? null : archivedAt ?? this.archivedAt,
     );
   }
 }
