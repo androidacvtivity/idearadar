@@ -259,4 +259,49 @@ void main() {
     expect(find.text('3 of 3'), findsOneWidget);
   });
 
+
+  testWidgets('schedules and clears the next review date', (tester) async {
+    final now = DateTime.now();
+    final repository = InMemoryIdeaRepository(
+      seedIdeas: [
+        Idea(
+          id: 'idea-review',
+          title: 'Idea requiring review',
+          domain: 'Planning',
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Idea requiring review'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('next_review_tile')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Select next review date'), findsOneWidget);
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    var savedIdea = (await repository.getIdeas()).single;
+    expect(savedIdea.nextReviewAt, isNotNull);
+    expect(find.textContaining('Review '), findsOneWidget);
+
+    await tester.tap(find.text('Idea requiring review'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('clear_next_review_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Remove review date?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Remove'));
+    await tester.pumpAndSettle();
+
+    savedIdea = (await repository.getIdeas()).single;
+    expect(savedIdea.nextReviewAt, isNull);
+    expect(find.textContaining('Review '), findsNothing);
+  });
+
 }
