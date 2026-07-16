@@ -3,9 +3,10 @@ import 'package:sqflite/sqflite.dart';
 
 class IdeaDatabase {
   static const databaseName = 'idearadar.db';
-  static const databaseVersion = 2;
+  static const databaseVersion = 3;
   static const ideasTable = 'ideas';
   static const notesTable = 'idea_notes';
+  static const sourcesTable = 'idea_sources';
 
   Database? _database;
 
@@ -26,10 +27,14 @@ class IdeaDatabase {
       onCreate: (database, version) async {
         await _createIdeasTable(database);
         await _createNotesTable(database);
+        await _createSourcesTable(database);
       },
       onUpgrade: (database, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await _createNotesTable(database);
+        }
+        if (oldVersion < 3) {
+          await _createSourcesTable(database);
         }
       },
     );
@@ -72,6 +77,22 @@ class IdeaDatabase {
         content TEXT NOT NULL,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
+        FOREIGN KEY (idea_id) REFERENCES $ideasTable (id) ON DELETE CASCADE
+      )
+    ''');
+  }
+
+  static Future<void> _createSourcesTable(Database database) {
+    return database.execute('''
+      CREATE TABLE $sourcesTable (
+        id TEXT PRIMARY KEY,
+        idea_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        url TEXT NOT NULL DEFAULT '',
+        source_type TEXT NOT NULL,
+        note TEXT NOT NULL DEFAULT '',
+        accessed_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
         FOREIGN KEY (idea_id) REFERENCES $ideasTable (id) ON DELETE CASCADE
       )
     ''');
