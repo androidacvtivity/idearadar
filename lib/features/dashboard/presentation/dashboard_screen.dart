@@ -5,6 +5,8 @@ import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_details_result.dart';
 import 'package:idearadar/features/ideas/presentation/idea_details_screen.dart';
+import 'package:idearadar/features/ideas/presentation/idea_filter_sheet.dart';
+import 'package:idearadar/features/ideas/presentation/idea_list_options.dart';
 import 'package:idearadar/features/ideas/presentation/idea_search_delegate.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -20,6 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Idea> _ideas = [];
   bool _isLoading = true;
   String? _loadError;
+  IdeaListOptions _listOptions = const IdeaListOptions();
 
   @override
   void initState() {
@@ -61,6 +64,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   int get _validatedIdeas {
     return _ideas.where((idea) => idea.status == IdeaStatus.validated).length;
+  }
+
+  List<Idea> get _visibleIdeas {
+    final visibleIdeas = _ideas.where((idea) {
+      final statusMatches =
+          _listOptions.status == null || idea.status == _listOptions.status;
+      final minimumScore = _listOptions.minimumScore;
+      final scoreMatches =
+          minimumScore == null ||
+          (idea.totalScore != null && idea.totalScore! >= minimumScore);
+      return statusMatches && scoreMatches;
+    }).toList();
+
+    visibleIdeas.sort((a, b) {
+      return switch (_listOptions.sort) {
+        IdeaSort.updated => b.updatedAt.compareTo(a.updatedAt),
+        IdeaSort.score => (b.totalScore ?? -1).compareTo(a.totalScore ?? -1),
+        IdeaSort.created => b.createdAt.compareTo(a.createdAt),
+        IdeaSort.nextReview => _compareReviewDates(a, b),
+      };
+    });
+    return visibleIdeas;
+  }
+
+  int _compareReviewDates(Idea a, Idea b) {
+    final aDate = a.nextReviewAt;
+    final bDate = b.nextReviewAt;
+    if (aDate == null && bDate == null) {
+      return 0;
+    }
+    if (aDate == null) {
+      return 1;
+    }
+    if (bDate == null) {
+      return -1;
+    }
+    return aDate.compareTo(bDate);
   }
 
   Future<void> _addIdea() async {
@@ -168,6 +208,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Future<void> _openFilters() async {
+    final options = await showModalBottomSheet<IdeaListOptions>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => IdeaFilterSheet(options: _listOptions),
+    );
+
+    if (!mounted || options == null) {
+      return;
+    }
+
+    setState(() => _listOptions = options);
+  }
+
+  void _clearFilters() {
+    setState(() => _listOptions = const IdeaListOptions());
+  }
+
   Future<void> _searchIdeas() async {
     if (_ideas.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -192,6 +250,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final visibleIdeas = _visibleIdeas;
 
     return Scaffold(
       appBar: AppBar(
@@ -200,6 +259,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [
+          IconButton(
+            onPressed: _isLoading || _ideas.isEmpty ? null : _openFilters,
+            tooltip: 'Filter and sort ideas',
+            icon: _listOptions.activeFilterCount == 0
+                ? const Icon(Icons.tune)
+                : Badge.count(
+                    count: _listOptions.activeFilterCount,
+                    child: const Icon(Icons.tune),
+                  ),
+          ),
           IconButton(
             onPressed: _isLoading ? null : _searchIdeas,
             tooltip: 'Search ideas',
@@ -286,15 +355,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
             else if (_ideas.isEmpty)
               _EmptyState(onAddIdea: _addIdea)
             else ...[
-              Text(
-                'Recent ideas',
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                children: [
+                  Text(
+                    'Ideas',
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${visibleIdeas.length} of ${_ideas.length}',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
-              for (final idea in _ideas)
-                _IdeaCard(idea: idea, onTap: () => _openIdea(idea)),
+              if (visibleIdeas.isEmpty)
+                _NoFilterResults(onClear: _clearFilters)
+              else
+                for (final idea in visibleIdeas)
+                  _IdeaCard(idea: idea, onTap: () => _openIdea(idea)),
             ],
           ],
         ),
@@ -303,6 +386,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onPressed: _addIdea,
         icon: const Icon(Icons.add),
         label: const Text('New idea'),
+      ),
+    );
+  }
+}
+
+class _NoFilterResults extends StatelessWidget {
+  const _NoFilterResults({required this.onClear});
+
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          children: [
+            Icon(
+              Icons.filter_alt_off_outlined,
+              size: 44,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'No ideas match these filters.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton(
+              key: const Key('clear_idea_filters_button'),
+              onPressed: onClear,
+              child: const Text('Clear filters'),
+            ),
+          ],
+        ),
       ),
     );
   }
