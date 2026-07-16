@@ -179,6 +179,9 @@ void main() {
   });
 
   testWidgets('filters by status and sorts ideas by score', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     final now = DateTime(2026, 7, 16);
     IdeaEvaluation evaluation(int score) {
       return IdeaEvaluation(
