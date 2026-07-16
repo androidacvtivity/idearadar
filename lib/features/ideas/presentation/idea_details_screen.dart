@@ -42,6 +42,64 @@ class IdeaDetailsScreen extends StatelessWidget {
     Navigator.of(context).pop(IdeaUpdatedResult(updatedIdea));
   }
 
+  Future<void> _scheduleReview(BuildContext context) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final currentDate = idea.nextReviewAt;
+    final initialDate = currentDate != null && !currentDate.isBefore(today)
+        ? currentDate
+        : today.add(const Duration(days: 7));
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: today,
+      lastDate: DateTime(today.year + 10, 12, 31),
+      helpText: 'Select next review date',
+    );
+
+    if (!context.mounted || selectedDate == null) {
+      return;
+    }
+
+    final updatedIdea = idea.copyWith(
+      nextReviewAt: selectedDate,
+      updatedAt: DateTime.now(),
+    );
+    Navigator.of(context).pop(IdeaUpdatedResult(updatedIdea));
+  }
+
+  Future<void> _clearReview(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Remove review date?'),
+        content: const Text(
+          'The idea will no longer appear in the next review schedule.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+
+    if (!context.mounted || confirmed != true) {
+      return;
+    }
+
+    final updatedIdea = idea.copyWith(
+      clearNextReviewAt: true,
+      updatedAt: DateTime.now(),
+    );
+    Navigator.of(context).pop(IdeaUpdatedResult(updatedIdea));
+  }
+
   Future<void> _deleteIdea(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -219,6 +277,37 @@ class IdeaDetailsScreen extends StatelessWidget {
                 title: const Text('Research sources'),
                 subtitle: const Text('Attach links, reports, and interviews'),
                 trailing: const Icon(Icons.chevron_right),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                key: const Key('next_review_tile'),
+                onTap: () => _scheduleReview(context),
+                leading: CircleAvatar(
+                  backgroundColor: colorScheme.primaryContainer,
+                  foregroundColor: colorScheme.onPrimaryContainer,
+                  child: const Icon(Icons.event_repeat_outlined),
+                ),
+                title: const Text('Next review'),
+                subtitle: Text(
+                  idea.nextReviewAt == null
+                      ? 'Not scheduled'
+                      : _formatDate(idea.nextReviewAt!),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (idea.nextReviewAt != null)
+                      IconButton(
+                        key: const Key('clear_next_review_button'),
+                        onPressed: () => _clearReview(context),
+                        tooltip: 'Remove review date',
+                        icon: const Icon(Icons.event_busy_outlined),
+                      ),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
