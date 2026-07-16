@@ -100,6 +100,42 @@ class IdeaDetailsScreen extends StatelessWidget {
     Navigator.of(context).pop(IdeaUpdatedResult(updatedIdea));
   }
 
+  Future<void> _toggleArchive(BuildContext context) async {
+    final restoring = idea.isArchived;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(restoring ? 'Restore idea?' : 'Archive idea?'),
+        content: Text(
+          restoring
+              ? 'The idea will return to the active dashboard.'
+              : 'The idea will move to the archive. You can restore it later.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(restoring ? 'Restore' : 'Archive'),
+          ),
+        ],
+      ),
+    );
+
+    if (!context.mounted || confirmed != true) {
+      return;
+    }
+
+    final updatedIdea = idea.copyWith(
+      archivedAt: restoring ? null : DateTime.now(),
+      clearArchivedAt: restoring,
+      updatedAt: DateTime.now(),
+    );
+    Navigator.of(context).pop(IdeaUpdatedResult(updatedIdea));
+  }
+
   Future<void> _deleteIdea(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -153,12 +189,30 @@ class IdeaDetailsScreen extends StatelessWidget {
           PopupMenuButton<_IdeaMenuAction>(
             tooltip: 'More actions',
             onSelected: (action) {
-              if (action == _IdeaMenuAction.delete) {
-                _deleteIdea(context);
+              switch (action) {
+                case _IdeaMenuAction.toggleArchive:
+                  _toggleArchive(context);
+                case _IdeaMenuAction.delete:
+                  _deleteIdea(context);
               }
             },
-            itemBuilder: (context) => const [
+            itemBuilder: (context) => [
               PopupMenuItem(
+                value: _IdeaMenuAction.toggleArchive,
+                child: Row(
+                  children: [
+                    Icon(
+                      idea.isArchived
+                          ? Icons.unarchive_outlined
+                          : Icons.archive_outlined,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(idea.isArchived ? 'Restore idea' : 'Archive idea'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem(
                 value: _IdeaMenuAction.delete,
                 child: Row(
                   children: [
@@ -443,4 +497,4 @@ class _DateRow extends StatelessWidget {
   }
 }
 
-enum _IdeaMenuAction { delete }
+enum _IdeaMenuAction { toggleArchive, delete }
