@@ -302,7 +302,4 @@ class _DateRow extends StatelessWidget {
   }
 }
 
-
-enum _IdeaMenuAction {
-  delete,
-}
+enum _IdeaMenuAction { delete }

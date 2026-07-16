@@ -149,9 +149,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _ideas.removeWhere((idea) => idea.id == ideaId);
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Idea deleted.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Idea deleted.')));
     } catch (_) {
       if (!mounted) {
         return;

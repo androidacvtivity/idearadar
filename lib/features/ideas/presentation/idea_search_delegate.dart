@@ -55,20 +55,22 @@ class IdeaSearchDelegate extends SearchDelegate<Idea?> {
       return List<Idea>.unmodifiable(ideas);
     }
 
-    return ideas.where((idea) {
-      final searchableText = [
-        idea.title,
-        idea.domain,
-        idea.status.label,
-        idea.summary,
-        idea.problem,
-        idea.solution,
-        idea.targetUsers,
-        idea.payingCustomer,
-      ].join(' ').toLowerCase();
+    return ideas
+        .where((idea) {
+          final searchableText = [
+            idea.title,
+            idea.domain,
+            idea.status.label,
+            idea.summary,
+            idea.problem,
+            idea.solution,
+            idea.targetUsers,
+            idea.payingCustomer,
+          ].join(' ').toLowerCase();
 
-      return searchableText.contains(normalizedQuery);
-    }).toList(growable: false);
+          return searchableText.contains(normalizedQuery);
+        })
+        .toList(growable: false);
   }
 }
 
@@ -100,9 +102,9 @@ class _SearchResults extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'No ideas found',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 6),
               Text(
@@ -127,11 +129,7 @@ class _SearchResults extends StatelessWidget {
         return ListTile(
           onTap: () => onSelected(idea),
           leading: const Icon(Icons.lightbulb_outline),
-          title: Text(
-            idea.title,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
+          title: Text(idea.title, maxLines: 2, overflow: TextOverflow.ellipsis),
           subtitle: Text(
             '${idea.domain} · ${idea.status.label}',
             maxLines: 1,
