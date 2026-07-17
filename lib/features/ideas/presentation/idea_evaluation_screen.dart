@@ -101,42 +101,18 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
             children: [
               Container(
+                key: const Key('evaluation_score_header'),
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.analytics_outlined,
-                      size: 36,
-                      color: colorScheme.onPrimaryContainer,
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Opportunity score',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  color: colorScheme.onPrimaryContainer,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Adjust each criterion from 1 to 5.',
-                            style: TextStyle(
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final textScaler = MediaQuery.textScalerOf(context);
+                    final useStackedLayout =
+                        constraints.maxWidth < 330 || textScaler.scale(1) > 1.2;
+                    final score = Text(
                       '$_totalScore/40',
                       key: const Key('evaluation_total_score'),
                       style: Theme.of(context).textTheme.headlineSmall
@@ -144,8 +120,62 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
                             color: colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.w800,
                           ),
-                    ),
-                  ],
+                    );
+                    final summary = Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.analytics_outlined,
+                          size: 36,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Opportunity score',
+                                key: const Key('evaluation_score_title'),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(
+                                      color: colorScheme.onPrimaryContainer,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Adjust each criterion from 1 to 5.',
+                                key: const Key('evaluation_score_explanation'),
+                                style: TextStyle(
+                                  color: colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+
+                    if (useStackedLayout) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          summary,
+                          const SizedBox(height: 12),
+                          Align(alignment: Alignment.centerRight, child: score),
+                        ],
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        Expanded(child: summary),
+                        const SizedBox(width: 16),
+                        score,
+                      ],
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 20),
