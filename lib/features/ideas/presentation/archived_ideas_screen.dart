@@ -54,10 +54,8 @@ class _ArchivedIdeasScreenState extends State<ArchivedIdeasScreen> {
   Future<void> _openIdea(Idea idea) async {
     final result = await Navigator.of(context).push<IdeaDetailsResult>(
       MaterialPageRoute(
-        builder: (_) => IdeaDetailsScreen(
-          idea: idea,
-          repository: widget.repository,
-        ),
+        builder: (_) =>
+            IdeaDetailsScreen(idea: idea, repository: widget.repository),
       ),
     );
 
@@ -94,7 +92,9 @@ class _ArchivedIdeasScreenState extends State<ArchivedIdeasScreen> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('The archived idea could not be updated.')),
+        const SnackBar(
+          content: Text('The archived idea could not be updated.'),
+        ),
       );
     }
   }
@@ -168,9 +168,9 @@ class _EmptyArchive extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'No archived ideas',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             const Text(

@@ -45,10 +45,7 @@ void main() {
       find.byKey(const Key('idea_domain_field')),
       'Business services',
     );
-    await tester.drag(
-      find.byType(ListView),
-      const Offset(0, -700),
-    );
+    await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.byKey(const Key('idea_target_users_field')),
@@ -377,5 +374,4 @@ void main() {
 
     expect(find.text('Idea to archive'), findsOneWidget);
   });
-
 }
