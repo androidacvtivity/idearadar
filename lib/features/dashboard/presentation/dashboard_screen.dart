@@ -277,7 +277,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'IdeaRadar',
+          'Idea Tracker',
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [

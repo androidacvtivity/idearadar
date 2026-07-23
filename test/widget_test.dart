@@ -14,10 +14,10 @@ Future<InMemoryIdeaRepository> pumpIdeaRadar(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('shows the IdeaRadar dashboard', (tester) async {
+  testWidgets('shows the Idea Tracker dashboard', (tester) async {
     await pumpIdeaRadar(tester);
 
-    expect(find.text('IdeaRadar'), findsOneWidget);
+    expect(find.text('Idea Tracker'), findsOneWidget);
     expect(find.text('From idea to opportunity.'), findsOneWidget);
     expect(find.text('Add your first idea'), findsOneWidget);
     expect(find.text('New idea'), findsOneWidget);

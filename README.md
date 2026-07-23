@@ -1,8 +1,8 @@
-# IdeaRadar
+# Idea Tracker
 
 **From idea to opportunity.**
 
-IdeaRadar is a cross-platform application for capturing, evaluating, and
+Idea Tracker is a cross-platform application for capturing, evaluating, and
 tracking ideas from discovery to launch.
 
 ## Product status
