@@ -296,7 +296,11 @@ void main() {
     await tester.tap(find.text('Idea requiring review'));
     await tester.pumpAndSettle();
     final nextReviewTile = find.byKey(const Key('next_review_tile'));
-    await tester.ensureVisible(nextReviewTile);
+    await tester.scrollUntilVisible(
+      nextReviewTile,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(nextReviewTile);
     await tester.pumpAndSettle();
@@ -314,7 +318,11 @@ void main() {
     final clearReviewButton = find.byKey(
       const Key('clear_next_review_button'),
     );
-    await tester.ensureVisible(clearReviewButton);
+    await tester.scrollUntilVisible(
+      clearReviewButton,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(clearReviewButton);
     await tester.pumpAndSettle();
