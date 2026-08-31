@@ -295,7 +295,10 @@ void main() {
 
     await tester.tap(find.text('Idea requiring review'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('next_review_tile')));
+    final nextReviewTile = find.byKey(const Key('next_review_tile'));
+    await tester.ensureVisible(nextReviewTile);
+    await tester.pumpAndSettle();
+    await tester.tap(nextReviewTile);
     await tester.pumpAndSettle();
 
     expect(find.text('Select next review date'), findsOneWidget);
@@ -308,7 +311,12 @@ void main() {
 
     await tester.tap(find.text('Idea requiring review'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('clear_next_review_button')));
+    final clearReviewButton = find.byKey(
+      const Key('clear_next_review_button'),
+    );
+    await tester.ensureVisible(clearReviewButton);
+    await tester.pumpAndSettle();
+    await tester.tap(clearReviewButton);
     await tester.pumpAndSettle();
 
     expect(find.text('Remove review date?'), findsOneWidget);
