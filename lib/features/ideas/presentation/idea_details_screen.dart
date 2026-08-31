@@ -308,7 +308,9 @@ class IdeaDetailsScreen extends StatelessWidget {
                   child: const Icon(Icons.radar),
                 ),
                 title: const Text('Assumption Radar'),
-                subtitle: const Text('Find what your idea still needs to prove'),
+                subtitle: const Text(
+                  'Find what your idea still needs to prove',
+                ),
                 trailing: const Icon(Icons.chevron_right),
               ),
             ),

@@ -315,9 +315,7 @@ void main() {
 
     await tester.tap(find.text('Idea requiring review'));
     await tester.pumpAndSettle();
-    final clearReviewButton = find.byKey(
-      const Key('clear_next_review_button'),
-    );
+    final clearReviewButton = find.byKey(const Key('clear_next_review_button'));
     await tester.scrollUntilVisible(
       clearReviewButton,
       300,

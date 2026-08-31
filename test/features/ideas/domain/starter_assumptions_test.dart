@@ -28,7 +28,9 @@ void main() {
       ]),
     );
     expect(
-      assumptions.every((item) => item.confidence == AssumptionConfidence.untested),
+      assumptions.every(
+        (item) => item.confidence == AssumptionConfidence.untested,
+      ),
       isTrue,
     );
     expect(assumptions.every((item) => item.isCritical), isTrue);

@@ -60,9 +60,9 @@ class _AssumptionRadarScreenState extends State<AssumptionRadarScreen> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'How strong is the evidence?',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ),
             ),
@@ -98,155 +98,160 @@ class _AssumptionRadarScreenState extends State<AssumptionRadarScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _assumptions.isEmpty
-              ? _EmptyRadar(
-                  ideaTitle: widget.idea.title,
-                  onCreate: _createStarterAssumptions,
-                )
-              : Builder(
-                  builder: (context) {
-                    final radar = AssumptionRadar.analyze(_assumptions);
-                    return ListView(
-                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(22),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(24),
+          ? _EmptyRadar(
+              ideaTitle: widget.idea.title,
+              onCreate: _createStarterAssumptions,
+            )
+          : Builder(
+              builder: (context) {
+                final radar = AssumptionRadar.analyze(_assumptions);
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(22),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.radar,
+                                size: 32,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                              const Spacer(),
+                              Text(
+                                '${radar.overallConfidence}%',
+                                key: const Key('radar_overall_confidence'),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: colorScheme.onPrimaryContainer,
+                                    ),
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: 14),
+                          Text(
+                            'Overall confidence',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: colorScheme.onPrimaryContainer,
+                                ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'This is not a quality score. It shows how much of the idea is supported by evidence.',
+                            style: TextStyle(
+                              color: colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (radar.weakestSignal != null)
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
                                   Icon(
-                                    Icons.radar,
-                                    size: 32,
-                                    color: colorScheme.onPrimaryContainer,
+                                    Icons.sensors_off_outlined,
+                                    color: colorScheme.error,
                                   ),
-                                  const Spacer(),
+                                  const SizedBox(width: 10),
                                   Text(
-                                    '${radar.overallConfidence}%',
-                                    key: const Key('radar_overall_confidence'),
+                                    'Weakest signal',
                                     style: Theme.of(context)
                                         .textTheme
-                                        .headlineMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w800,
-                                          color: colorScheme.onPrimaryContainer,
-                                        ),
+                                        .titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w700),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 12),
                               Text(
-                                'Overall confidence',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color: colorScheme.onPrimaryContainer,
-                                    ),
+                                radar.weakestSignal!.title,
+                                key: const Key('radar_weakest_signal'),
+                                style: Theme.of(context).textTheme.titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'This is not a quality score. It shows how much of the idea is supported by evidence.',
-                                style: TextStyle(color: colorScheme.onPrimaryContainer),
+                                '${radar.weakestSignal!.confidencePercent}% confidence',
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        if (radar.weakestSignal != null)
-                          Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(18),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                    if (radar.nextExperiment != null) ...[
+                      const SizedBox(height: 12),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.sensors_off_outlined,
-                                          color: colorScheme.error),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        'Weakest signal',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(fontWeight: FontWeight.w700),
-                                      ),
-                                    ],
+                                  Icon(
+                                    Icons.science_outlined,
+                                    color: colorScheme.primary,
                                   ),
-                                  const SizedBox(height: 12),
+                                  const SizedBox(width: 10),
                                   Text(
-                                    radar.weakestSignal!.title,
-                                    key: const Key('radar_weakest_signal'),
+                                    'Next experiment',
                                     style: Theme.of(context)
                                         .textTheme
-                                        .titleLarge
+                                        .titleMedium
                                         ?.copyWith(fontWeight: FontWeight.w700),
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    '${radar.weakestSignal!.confidencePercent}% confidence',
-                                  ),
                                 ],
                               ),
-                            ),
-                          ),
-                        if (radar.nextExperiment != null) ...[
-                          const SizedBox(height: 12),
-                          Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(18),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.science_outlined,
-                                          color: colorScheme.primary),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        'Next experiment',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(fontWeight: FontWeight.w700),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    radar.nextExperiment!,
-                                    key: const Key('radar_next_experiment'),
-                                  ),
-                                ],
+                              const SizedBox(height: 10),
+                              Text(
+                                radar.nextExperiment!,
+                                key: const Key('radar_next_experiment'),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                        const SizedBox(height: 22),
-                        Text(
-                          'Critical assumptions',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Tap an assumption when new evidence changes your confidence.',
-                          style: TextStyle(color: colorScheme.onSurfaceVariant),
-                        ),
-                        const SizedBox(height: 12),
-                        for (final assumption in _assumptions)
-                          _AssumptionCard(
-                            assumption: assumption,
-                            onTap: () => _changeConfidence(assumption),
-                          ),
-                      ],
-                    );
-                  },
-                ),
+                      ),
+                    ],
+                    const SizedBox(height: 22),
+                    Text(
+                      'Critical assumptions',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tap an assumption when new evidence changes your confidence.',
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 12),
+                    for (final assumption in _assumptions)
+                      _AssumptionCard(
+                        assumption: assumption,
+                        onTap: () => _changeConfidence(assumption),
+                      ),
+                  ],
+                );
+              },
+            ),
     );
   }
 }
@@ -269,9 +274,9 @@ class _EmptyRadar extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               'What must be true?',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 12),
             Text(
@@ -316,15 +321,17 @@ class _AssumptionCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(_confidenceIcon(assumption.confidence),
-                      color: _confidenceColor(context, assumption.confidence)),
+                  Icon(
+                    _confidenceIcon(assumption.confidence),
+                    color: _confidenceColor(context, assumption.confidence),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       assumption.title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   Text('$percent%'),

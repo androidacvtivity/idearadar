@@ -33,8 +33,7 @@ class AssumptionRadar {
     }
 
     critical.sort((a, b) {
-      final byConfidence =
-          a.confidencePercent.compareTo(b.confidencePercent);
+      final byConfidence = a.confidencePercent.compareTo(b.confidencePercent);
       if (byConfidence != 0) {
         return byConfidence;
       }

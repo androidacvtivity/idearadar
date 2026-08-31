@@ -9,13 +9,7 @@ enum IdeaAssumptionType {
   custom,
 }
 
-enum AssumptionConfidence {
-  untested,
-  weak,
-  uncertain,
-  supported,
-  strong,
-}
+enum AssumptionConfidence { untested, weak, uncertain, supported, strong }
 
 class IdeaAssumption {
   const IdeaAssumption({
