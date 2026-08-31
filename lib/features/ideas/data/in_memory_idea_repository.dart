@@ -1,5 +1,6 @@
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
+import 'package:idearadar/features/ideas/domain/idea_assumption.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 import 'package:idearadar/features/ideas/domain/idea_source.dart';
 
@@ -8,13 +9,16 @@ class InMemoryIdeaRepository implements IdeaRepository {
     List<Idea> seedIdeas = const [],
     List<IdeaNote> seedNotes = const [],
     List<IdeaSource> seedSources = const [],
+    List<IdeaAssumption> seedAssumptions = const [],
   }) : _ideas = List<Idea>.from(seedIdeas),
        _notes = List<IdeaNote>.from(seedNotes),
-       _sources = List<IdeaSource>.from(seedSources);
+       _sources = List<IdeaSource>.from(seedSources),
+       _assumptions = List<IdeaAssumption>.from(seedAssumptions);
 
   final List<Idea> _ideas;
   final List<IdeaNote> _notes;
   final List<IdeaSource> _sources;
+  final List<IdeaAssumption> _assumptions;
 
   @override
   Future<void> initialize() async {}
@@ -49,6 +53,7 @@ class InMemoryIdeaRepository implements IdeaRepository {
     _ideas.removeWhere((idea) => idea.id == ideaId);
     _notes.removeWhere((note) => note.ideaId == ideaId);
     _sources.removeWhere((source) => source.ideaId == ideaId);
+    _assumptions.removeWhere((assumption) => assumption.ideaId == ideaId);
   }
 
   @override
@@ -117,5 +122,43 @@ class InMemoryIdeaRepository implements IdeaRepository {
       throw StateError('Source not found: $sourceId');
     }
     _sources.removeWhere((source) => source.id == sourceId);
+  }
+
+  @override
+  Future<List<IdeaAssumption>> getAssumptions(String ideaId) async {
+    final assumptions = _assumptions
+        .where((assumption) => assumption.ideaId == ideaId)
+        .toList();
+    return List<IdeaAssumption>.unmodifiable(assumptions);
+  }
+
+  @override
+  Future<void> addAssumption(IdeaAssumption assumption) async {
+    if (!_ideas.any((idea) => idea.id == assumption.ideaId)) {
+      throw StateError('Idea not found: ${assumption.ideaId}');
+    }
+    _assumptions.add(assumption);
+  }
+
+  @override
+  Future<void> updateAssumption(IdeaAssumption assumption) async {
+    final index = _assumptions.indexWhere(
+      (current) => current.id == assumption.id,
+    );
+    if (index == -1) {
+      throw StateError('Assumption not found: ${assumption.id}');
+    }
+    _assumptions[index] = assumption;
+  }
+
+  @override
+  Future<void> deleteAssumption(String assumptionId) async {
+    final removed = _assumptions
+        .where((assumption) => assumption.id == assumptionId)
+        .length;
+    if (removed != 1) {
+      throw StateError('Assumption not found: $assumptionId');
+    }
+    _assumptions.removeWhere((assumption) => assumption.id == assumptionId);
   }
 }
