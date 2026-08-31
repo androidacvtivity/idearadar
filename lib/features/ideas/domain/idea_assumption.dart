@@ -27,10 +27,12 @@ class IdeaAssumption {
     this.evidenceCount = 0,
     this.nextExperiment,
     this.isCritical = true,
-  });
+  }) : assert(id != ''),
+       assert(ideaId != ''),
+       assert(title != '');
 
-  final int id;
-  final int ideaId;
+  final String id;
+  final String ideaId;
   final String title;
   final IdeaAssumptionType type;
   final AssumptionConfidence confidence;
@@ -53,12 +55,11 @@ class IdeaAssumption {
     }
   }
 
-  bool get needsAttention =>
-      isCritical && confidencePercent < 75;
+  bool get needsAttention => isCritical && confidencePercent < 75;
 
   IdeaAssumption copyWith({
-    int? id,
-    int? ideaId,
+    String? id,
+    String? ideaId,
     String? title,
     IdeaAssumptionType? type,
     AssumptionConfidence? confidence,
