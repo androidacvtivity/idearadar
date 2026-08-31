@@ -3,6 +3,7 @@ import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 import 'package:idearadar/features/ideas/presentation/add_idea_screen.dart';
+import 'package:idearadar/features/ideas/presentation/assumption_radar_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_details_result.dart';
 import 'package:idearadar/features/ideas/presentation/idea_evaluation_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_notes_screen.dart';
@@ -286,6 +287,28 @@ class IdeaDetailsScreen extends StatelessWidget {
                       ? 'Not evaluated'
                       : '${idea.totalScore} out of 40',
                 ),
+                trailing: const Icon(Icons.chevron_right),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                key: const Key('assumption_radar_tile'),
+                onTap: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (_) => AssumptionRadarScreen(
+                      idea: idea,
+                      repository: repository,
+                    ),
+                  ),
+                ),
+                leading: CircleAvatar(
+                  backgroundColor: colorScheme.primaryContainer,
+                  foregroundColor: colorScheme.onPrimaryContainer,
+                  child: const Icon(Icons.radar),
+                ),
+                title: const Text('Assumption Radar'),
+                subtitle: const Text('Find what your idea still needs to prove'),
                 trailing: const Icon(Icons.chevron_right),
               ),
             ),
