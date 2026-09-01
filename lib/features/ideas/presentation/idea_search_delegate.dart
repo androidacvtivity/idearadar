@@ -15,34 +15,34 @@ class IdeaSearchDelegate extends SearchDelegate<Idea?> {
 
   @override
   List<Widget> buildActions(BuildContext context) => [
-        if (query.isNotEmpty)
-          IconButton(
-            onPressed: () => query = '',
-            tooltip: itx(context, 'clear_search'),
-            icon: const Icon(Icons.clear),
-          ),
-      ];
+    if (query.isNotEmpty)
+      IconButton(
+        onPressed: () => query = '',
+        tooltip: itx(context, 'clear_search'),
+        icon: const Icon(Icons.clear),
+      ),
+  ];
 
   @override
   Widget buildLeading(BuildContext context) => IconButton(
-        onPressed: () => close(context, null),
-        tooltip: itx(context, 'close_search'),
-        icon: const Icon(Icons.arrow_back),
-      );
+    onPressed: () => close(context, null),
+    tooltip: itx(context, 'close_search'),
+    icon: const Icon(Icons.arrow_back),
+  );
 
   @override
   Widget buildResults(BuildContext context) => _SearchResults(
-        query: query,
-        ideas: _matchingIdeas,
-        onSelected: (idea) => close(context, idea),
-      );
+    query: query,
+    ideas: _matchingIdeas,
+    onSelected: (idea) => close(context, idea),
+  );
 
   @override
   Widget buildSuggestions(BuildContext context) => _SearchResults(
-        query: query,
-        ideas: _matchingIdeas,
-        onSelected: (idea) => close(context, idea),
-      );
+    query: query,
+    ideas: _matchingIdeas,
+    onSelected: (idea) => close(context, idea),
+  );
 
   List<Idea> get _matchingIdeas {
     final normalizedQuery = query.trim().toLowerCase();
@@ -96,9 +96,9 @@ class _SearchResults extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 itx(context, 'no_ideas_found'),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 6),
               Text(

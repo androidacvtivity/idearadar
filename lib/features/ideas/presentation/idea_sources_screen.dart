@@ -52,10 +52,8 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
   Future<void> _openEditor([IdeaSource? source]) async {
     final saved = await Navigator.of(context).push<IdeaSource>(
       MaterialPageRoute(
-        builder: (_) => _SourceEditorScreen(
-          ideaId: widget.ideaId,
-          source: source,
-        ),
+        builder: (_) =>
+            _SourceEditorScreen(ideaId: widget.ideaId, source: source),
       ),
     );
     if (!mounted || saved == null) return;
@@ -69,7 +67,9 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
         await widget.repository.updateSource(saved);
         if (!mounted) return;
         setState(() {
-          final index = _sources.indexWhere((current) => current.id == saved.id);
+          final index = _sources.indexWhere(
+            (current) => current.id == saved.id,
+          );
           if (index != -1) _sources[index] = saved;
         });
       }
@@ -104,7 +104,9 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
     try {
       await widget.repository.deleteSource(source.id);
       if (!mounted) return;
-      setState(() => _sources.removeWhere((current) => current.id == source.id));
+      setState(
+        () => _sources.removeWhere((current) => current.id == source.id),
+      );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -121,69 +123,57 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _error != null
-                ? _SourcesError(message: _error!, onRetry: _loadSources)
-                : _sources.isEmpty
-                    ? const _EmptySources()
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
-                        itemCount: _sources.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final source = _sources[index];
-                          final type = localizedSourceType(
-                            context,
-                            source.sourceType,
-                          );
-                          return Card(
-                            child: ListTile(
-                              onTap: () => _openEditor(source),
-                              contentPadding: const EdgeInsets.fromLTRB(
-                                18,
-                                8,
-                                8,
-                                8,
-                              ),
-                              leading: CircleAvatar(
-                                child: Icon(_sourceIcon(source.sourceType)),
-                              ),
-                              title: Text(
-                                source.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              subtitle: Text(
-                                source.url.isEmpty
-                                    ? type
-                                    : '$type · ${source.url}',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              trailing: PopupMenuButton<_SourceAction>(
-                                tooltip: itx(context, 'source_actions'),
-                                onSelected: (action) {
-                                  switch (action) {
-                                    case _SourceAction.edit:
-                                      _openEditor(source);
-                                    case _SourceAction.delete:
-                                      _deleteSource(source);
-                                  }
-                                },
-                                itemBuilder: (_) => [
-                                  PopupMenuItem(
-                                    value: _SourceAction.edit,
-                                    child: Text(itx(context, 'edit')),
-                                  ),
-                                  PopupMenuItem(
-                                    value: _SourceAction.delete,
-                                    child: Text(itx(context, 'delete')),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+            ? _SourcesError(message: _error!, onRetry: _loadSources)
+            : _sources.isEmpty
+            ? const _EmptySources()
+            : ListView.separated(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+                itemCount: _sources.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final source = _sources[index];
+                  final type = localizedSourceType(context, source.sourceType);
+                  return Card(
+                    child: ListTile(
+                      onTap: () => _openEditor(source),
+                      contentPadding: const EdgeInsets.fromLTRB(18, 8, 8, 8),
+                      leading: CircleAvatar(
+                        child: Icon(_sourceIcon(source.sourceType)),
                       ),
+                      title: Text(
+                        source.title,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      subtitle: Text(
+                        source.url.isEmpty ? type : '$type · ${source.url}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: PopupMenuButton<_SourceAction>(
+                        tooltip: itx(context, 'source_actions'),
+                        onSelected: (action) {
+                          switch (action) {
+                            case _SourceAction.edit:
+                              _openEditor(source);
+                            case _SourceAction.delete:
+                              _deleteSource(source);
+                          }
+                        },
+                        itemBuilder: (_) => [
+                          PopupMenuItem(
+                            value: _SourceAction.edit,
+                            child: Text(itx(context, 'edit')),
+                          ),
+                          PopupMenuItem(
+                            value: _SourceAction.delete,
+                            child: Text(itx(context, 'delete')),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openEditor,
@@ -194,13 +184,13 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
   }
 
   static IconData _sourceIcon(IdeaSourceType type) => switch (type) {
-        IdeaSourceType.website => Icons.language,
-        IdeaSourceType.article => Icons.article_outlined,
-        IdeaSourceType.report => Icons.description_outlined,
-        IdeaSourceType.statistics => Icons.query_stats,
-        IdeaSourceType.interview => Icons.record_voice_over_outlined,
-        IdeaSourceType.other => Icons.link,
-      };
+    IdeaSourceType.website => Icons.language,
+    IdeaSourceType.article => Icons.article_outlined,
+    IdeaSourceType.report => Icons.description_outlined,
+    IdeaSourceType.statistics => Icons.query_stats,
+    IdeaSourceType.interview => Icons.record_voice_over_outlined,
+    IdeaSourceType.other => Icons.link,
+  };
 }
 
 class _SourceEditorScreen extends StatefulWidget {
@@ -391,9 +381,7 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
           key: const Key('save_source_button'),
           onPressed: _save,
           icon: const Icon(Icons.save_outlined),
-          label: Text(
-            itx(context, isEditing ? 'save_changes' : 'save_source'),
-          ),
+          label: Text(itx(context, isEditing ? 'save_changes' : 'save_source')),
         ),
       ),
     );
@@ -424,9 +412,9 @@ class _EmptySources extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               itx(context, 'no_research_sources'),
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             Text(

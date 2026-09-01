@@ -81,9 +81,9 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
       }
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(itx(context, 'note_save_error'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(itx(context, 'note_save_error'))));
     }
   }
 
@@ -127,63 +127,61 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _error != null
-                ? _NotesError(message: _error!, onRetry: _loadNotes)
-                : _notes.isEmpty
-                    ? const _EmptyNotes()
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
-                        itemCount: _notes.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final note = _notes[index];
-                          return Card(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(18, 16, 8, 16),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(note.content),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          _formatDate(note.updatedAt),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  PopupMenuButton<_NoteAction>(
-                                    tooltip: itx(context, 'note_actions'),
-                                    onSelected: (action) {
-                                      switch (action) {
-                                        case _NoteAction.edit:
-                                          _openNoteEditor(note);
-                                        case _NoteAction.delete:
-                                          _deleteNote(note);
-                                      }
-                                    },
-                                    itemBuilder: (_) => [
-                                      PopupMenuItem(
-                                        value: _NoteAction.edit,
-                                        child: Text(itx(context, 'edit')),
-                                      ),
-                                      PopupMenuItem(
-                                        value: _NoteAction.delete,
-                                        child: Text(itx(context, 'delete')),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+            ? _NotesError(message: _error!, onRetry: _loadNotes)
+            : _notes.isEmpty
+            ? const _EmptyNotes()
+            : ListView.separated(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+                itemCount: _notes.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final note = _notes[index];
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 16, 8, 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(note.content),
+                                const SizedBox(height: 12),
+                                Text(
+                                  _formatDate(note.updatedAt),
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
                             ),
-                          );
-                        },
+                          ),
+                          PopupMenuButton<_NoteAction>(
+                            tooltip: itx(context, 'note_actions'),
+                            onSelected: (action) {
+                              switch (action) {
+                                case _NoteAction.edit:
+                                  _openNoteEditor(note);
+                                case _NoteAction.delete:
+                                  _deleteNote(note);
+                              }
+                            },
+                            itemBuilder: (_) => [
+                              PopupMenuItem(
+                                value: _NoteAction.edit,
+                                child: Text(itx(context, 'edit')),
+                              ),
+                              PopupMenuItem(
+                                value: _NoteAction.delete,
+                                child: Text(itx(context, 'delete')),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
+                    ),
+                  );
+                },
+              ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openNoteEditor,
@@ -255,9 +253,9 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
                     ? 'new_research_note'
                     : 'edit_research_note',
               ),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -313,9 +311,9 @@ class _EmptyNotes extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               itx(context, 'no_research_notes'),
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             Text(

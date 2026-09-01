@@ -93,71 +93,165 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
   Widget build(BuildContext context) {
     final isEditing = widget.idea != null;
     return Scaffold(
-      appBar: AppBar(title: Text(isEditing ? tr(context, 'edit_idea') : itx(context, 'add_new_idea'))),
+      appBar: AppBar(
+        title: Text(
+          isEditing ? tr(context, 'edit_idea') : itx(context, 'add_new_idea'),
+        ),
+      ),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: _dismissKeyboard,
         child: SafeArea(
           child: Form(
             key: _formKey,
-            autovalidateMode: _showValidationErrors ? AutovalidateMode.onUserInteraction : AutovalidateMode.disabled,
+            autovalidateMode: _showValidationErrors
+                ? AutovalidateMode.onUserInteraction
+                : AutovalidateMode.disabled,
             child: ListView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
               children: [
                 Text(
-                  itx(context, isEditing ? 'update_opportunity' : 'capture_opportunity'),
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+                  itx(
+                    context,
+                    isEditing ? 'update_opportunity' : 'capture_opportunity',
+                  ),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  itx(context, isEditing ? 'update_opportunity_desc' : 'capture_opportunity_desc'),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  itx(
+                    context,
+                    isEditing
+                        ? 'update_opportunity_desc'
+                        : 'capture_opportunity_desc',
+                  ),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 28),
                 TextFormField(
-                  key: const Key('idea_title_field'), controller: _titleController, textCapitalization: TextCapitalization.sentences, textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(labelText: itx(context, 'title'), hintText: itx(context, 'title_hint'), prefixIcon: const Icon(Icons.lightbulb_outline)),
-                  validator: (value) => _requiredValidator(value, itx(context, 'title')),
+                  key: const Key('idea_title_field'),
+                  controller: _titleController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'title'),
+                    hintText: itx(context, 'title_hint'),
+                    prefixIcon: const Icon(Icons.lightbulb_outline),
+                  ),
+                  validator: (value) =>
+                      _requiredValidator(value, itx(context, 'title')),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  key: const Key('idea_domain_field'), controller: _domainController, textCapitalization: TextCapitalization.words, textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(labelText: itx(context, 'domain'), hintText: itx(context, 'domain_hint'), prefixIcon: const Icon(Icons.category_outlined)),
-                  validator: (value) => _requiredValidator(value, itx(context, 'domain')),
+                  key: const Key('idea_domain_field'),
+                  controller: _domainController,
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'domain'),
+                    hintText: itx(context, 'domain_hint'),
+                    prefixIcon: const Icon(Icons.category_outlined),
+                  ),
+                  validator: (value) =>
+                      _requiredValidator(value, itx(context, 'domain')),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<IdeaStatus>(
-                  key: const Key('idea_status_field'), initialValue: _status,
-                  decoration: InputDecoration(labelText: itx(context, 'status'), prefixIcon: const Icon(Icons.flag_outlined)),
-                  items: IdeaStatus.values.map((status) => DropdownMenuItem(value: status, child: Text(localizedIdeaStatus(context, status)))).toList(),
-                  onChanged: (status) { if (status != null) setState(() => _status = status); },
+                  key: const Key('idea_status_field'),
+                  initialValue: _status,
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'status'),
+                    prefixIcon: const Icon(Icons.flag_outlined),
+                  ),
+                  items: IdeaStatus.values
+                      .map(
+                        (status) => DropdownMenuItem(
+                          value: status,
+                          child: Text(localizedIdeaStatus(context, status)),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (status) {
+                    if (status != null) setState(() => _status = status);
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  key: const Key('idea_summary_field'), controller: _summaryController, textCapitalization: TextCapitalization.sentences, textInputAction: TextInputAction.next, minLines: 2, maxLines: 4,
-                  decoration: InputDecoration(labelText: tr(context, 'summary'), hintText: itx(context, 'summary_hint'), alignLabelWithHint: true),
+                  key: const Key('idea_summary_field'),
+                  controller: _summaryController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.next,
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'summary'),
+                    hintText: itx(context, 'summary_hint'),
+                    alignLabelWithHint: true,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  key: const Key('idea_problem_field'), controller: _problemController, textCapitalization: TextCapitalization.sentences, textInputAction: TextInputAction.next, minLines: 3, maxLines: 6,
-                  decoration: InputDecoration(labelText: tr(context, 'problem'), hintText: itx(context, 'problem_hint'), alignLabelWithHint: true),
+                  key: const Key('idea_problem_field'),
+                  controller: _problemController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.next,
+                  minLines: 3,
+                  maxLines: 6,
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'problem'),
+                    hintText: itx(context, 'problem_hint'),
+                    alignLabelWithHint: true,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  key: const Key('idea_solution_field'), controller: _solutionController, textCapitalization: TextCapitalization.sentences, textInputAction: TextInputAction.next, minLines: 3, maxLines: 6,
-                  decoration: InputDecoration(labelText: tr(context, 'proposed_solution'), hintText: itx(context, 'solution_hint'), alignLabelWithHint: true),
+                  key: const Key('idea_solution_field'),
+                  controller: _solutionController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.next,
+                  minLines: 3,
+                  maxLines: 6,
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'proposed_solution'),
+                    hintText: itx(context, 'solution_hint'),
+                    alignLabelWithHint: true,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  key: const Key('idea_target_users_field'), controller: _targetUsersController, textCapitalization: TextCapitalization.sentences, textInputAction: TextInputAction.next, minLines: 2, maxLines: 4,
-                  decoration: InputDecoration(labelText: tr(context, 'target_users'), hintText: itx(context, 'target_users_hint'), prefixIcon: const Icon(Icons.groups_outlined), alignLabelWithHint: true),
+                  key: const Key('idea_target_users_field'),
+                  controller: _targetUsersController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.next,
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'target_users'),
+                    hintText: itx(context, 'target_users_hint'),
+                    prefixIcon: const Icon(Icons.groups_outlined),
+                    alignLabelWithHint: true,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  key: const Key('idea_paying_customer_field'), controller: _payingCustomerController, textCapitalization: TextCapitalization.sentences, textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_) => _dismissKeyboard(), minLines: 2, maxLines: 4,
-                  decoration: InputDecoration(labelText: tr(context, 'paying_customer'), hintText: itx(context, 'paying_customer_hint'), prefixIcon: const Icon(Icons.payments_outlined), alignLabelWithHint: true),
+                  key: const Key('idea_paying_customer_field'),
+                  controller: _payingCustomerController,
+                  textCapitalization: TextCapitalization.sentences,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _dismissKeyboard(),
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'paying_customer'),
+                    hintText: itx(context, 'paying_customer_hint'),
+                    prefixIcon: const Icon(Icons.payments_outlined),
+                    alignLabelWithHint: true,
+                  ),
                 ),
               ],
             ),
@@ -167,7 +261,9 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(20, 8, 20, 16),
         child: FilledButton.icon(
-          key: const Key('save_idea_button'), onPressed: _saveIdea, icon: const Icon(Icons.save_outlined),
+          key: const Key('save_idea_button'),
+          onPressed: _saveIdea,
+          icon: const Icon(Icons.save_outlined),
           label: Text(itx(context, isEditing ? 'save_changes' : 'save_idea')),
         ),
       ),
