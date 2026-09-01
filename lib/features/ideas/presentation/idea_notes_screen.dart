@@ -5,24 +5,351 @@ import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 
 class IdeaNotesScreen extends StatefulWidget {
-  const IdeaNotesScreen({required this.repository, required this.ideaId, super.key});
+  const IdeaNotesScreen({
+    required this.repository,
+    required this.ideaId,
+    super.key,
+  });
+
   final IdeaRepository repository;
   final String ideaId;
-  @override State<IdeaNotesScreen> createState()=>_IdeaNotesScreenState();
+
+  @override
+  State<IdeaNotesScreen> createState() => _IdeaNotesScreenState();
 }
 
-class _IdeaNotesScreenState extends State<IdeaNotesScreen>{
-  final List<IdeaNote> _notes=[]; bool _isLoading=true; String? _error;
-  @override void initState(){super.initState();_loadNotes();}
-  Future<void> _loadNotes() async{try{final notes=await widget.repository.getNotes(widget.ideaId);if(!mounted)return;setState((){_notes..clear()..addAll(notes);_isLoading=false;_error=null;});}catch(_){if(!mounted)return;setState((){_isLoading=false;_error=itx(context,'notes_load_error');});}}
-  Future<void> _openNoteEditor([IdeaNote? note]) async{final content=await showModalBottomSheet<String>(context:context,isScrollControlled:true,builder:(_)=>_NoteEditorSheet(note:note));if(!mounted||content==null)return;final now=DateTime.now();try{if(note==null){final n=IdeaNote(id:now.microsecondsSinceEpoch.toString(),ideaId:widget.ideaId,content:content,createdAt:now,updatedAt:now);await widget.repository.addNote(n);if(!mounted)return;setState(()=>_notes.insert(0,n));}else{final updated=note.copyWith(content:content,updatedAt:now);await widget.repository.updateNote(updated);if(!mounted)return;setState((){final i=_notes.indexWhere((e)=>e.id==note.id);if(i!=-1)_notes[i]=updated;});}}catch(_){if(!mounted)return;ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text(itx(context,'note_save_error'))));}}
-  Future<void> _deleteNote(IdeaNote note) async{final confirmed=await showDialog<bool>(context:context,builder:(c)=>AlertDialog(title:Text(itx(c,'delete_note_question')),content:Text(itx(c,'delete_note_desc')),actions:[TextButton(onPressed:()=>Navigator.of(c).pop(false),child:Text(tr(c,'cancel'))),FilledButton(onPressed:()=>Navigator.of(c).pop(true),child:Text(tr(c,'delete')))]));if(!mounted||confirmed!=true)return;try{await widget.repository.deleteNote(note.id);if(!mounted)return;setState(()=>_notes.removeWhere((e)=>e.id==note.id));}catch(_){if(!mounted)return;ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text(itx(context,'note_delete_error'))));}}
-  @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:Text(tr(context,'research_notes'))),body:SafeArea(child:_isLoading?const Center(child:CircularProgressIndicator()):_error!=null?_NotesError(message:_error!,onRetry:_loadNotes):_notes.isEmpty?const _EmptyNotes():ListView.separated(padding:const EdgeInsets.fromLTRB(20,12,20,100),itemCount:_notes.length,separatorBuilder:(_,_)=>const SizedBox(height:12),itemBuilder:(context,index){final note=_notes[index];return Card(child:Padding(padding:const EdgeInsets.fromLTRB(18,16,8,16),child:Row(crossAxisAlignment:CrossAxisAlignment.start,children:[Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(note.content),const SizedBox(height:12),Text(_formatDate(note.updatedAt),style:Theme.of(context).textTheme.bodySmall)])),PopupMenuButton<_NoteAction>(tooltip:itx(context,'note_actions'),onSelected:(a){switch(a){case _NoteAction.edit:_openNoteEditor(note);case _NoteAction.delete:_deleteNote(note);}},itemBuilder:(_)=>[PopupMenuItem(value:_NoteAction.edit,child:Text(itx(context,'edit'))),PopupMenuItem(value:_NoteAction.delete,child:Text(itx(context,'delete')))])]))); })),floatingActionButton:FloatingActionButton.extended(onPressed:_openNoteEditor,icon:const Icon(Icons.note_add_outlined),label:Text(itx(context,'new_note'))));
-  static String _formatDate(DateTime d)=>'${d.day.toString().padLeft(2,'0')}.${d.month.toString().padLeft(2,'0')}.${d.year} · ${d.hour.toString().padLeft(2,'0')}:${d.minute.toString().padLeft(2,'0')}';
+class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
+  final List<IdeaNote> _notes = [];
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotes();
+  }
+
+  Future<void> _loadNotes() async {
+    try {
+      final notes = await widget.repository.getNotes(widget.ideaId);
+      if (!mounted) return;
+      setState(() {
+        _notes
+          ..clear()
+          ..addAll(notes);
+        _isLoading = false;
+        _error = null;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _error = itx(context, 'notes_load_error');
+      });
+    }
+  }
+
+  Future<void> _openNoteEditor([IdeaNote? note]) async {
+    final content = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => _NoteEditorSheet(note: note),
+    );
+    if (!mounted || content == null) return;
+
+    final now = DateTime.now();
+    try {
+      if (note == null) {
+        final newNote = IdeaNote(
+          id: now.microsecondsSinceEpoch.toString(),
+          ideaId: widget.ideaId,
+          content: content,
+          createdAt: now,
+          updatedAt: now,
+        );
+        await widget.repository.addNote(newNote);
+        if (!mounted) return;
+        setState(() => _notes.insert(0, newNote));
+      } else {
+        final updated = note.copyWith(content: content, updatedAt: now);
+        await widget.repository.updateNote(updated);
+        if (!mounted) return;
+        setState(() {
+          final index = _notes.indexWhere((current) => current.id == note.id);
+          if (index != -1) _notes[index] = updated;
+        });
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(itx(context, 'note_save_error'))),
+      );
+    }
+  }
+
+  Future<void> _deleteNote(IdeaNote note) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(itx(dialogContext, 'delete_note_question')),
+        content: Text(itx(dialogContext, 'delete_note_desc')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(tr(dialogContext, 'cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(tr(dialogContext, 'delete')),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+
+    try {
+      await widget.repository.deleteNote(note.id);
+      if (!mounted) return;
+      setState(() => _notes.removeWhere((current) => current.id == note.id));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(itx(context, 'note_delete_error'))),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(tr(context, 'research_notes'))),
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+                ? _NotesError(message: _error!, onRetry: _loadNotes)
+                : _notes.isEmpty
+                    ? const _EmptyNotes()
+                    : ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+                        itemCount: _notes.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final note = _notes[index];
+                          return Card(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(18, 16, 8, 16),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(note.content),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          _formatDate(note.updatedAt),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuButton<_NoteAction>(
+                                    tooltip: itx(context, 'note_actions'),
+                                    onSelected: (action) {
+                                      switch (action) {
+                                        case _NoteAction.edit:
+                                          _openNoteEditor(note);
+                                        case _NoteAction.delete:
+                                          _deleteNote(note);
+                                      }
+                                    },
+                                    itemBuilder: (_) => [
+                                      PopupMenuItem(
+                                        value: _NoteAction.edit,
+                                        child: Text(itx(context, 'edit')),
+                                      ),
+                                      PopupMenuItem(
+                                        value: _NoteAction.delete,
+                                        child: Text(itx(context, 'delete')),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _openNoteEditor,
+        icon: const Icon(Icons.note_add_outlined),
+        label: Text(itx(context, 'new_note')),
+      ),
+    );
+  }
+
+  static String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '$day.$month.${date.year} · $hour:$minute';
+  }
 }
 
-class _NoteEditorSheet extends StatefulWidget{const _NoteEditorSheet({this.note});final IdeaNote? note;@override State<_NoteEditorSheet> createState()=>_NoteEditorSheetState();}
-class _NoteEditorSheetState extends State<_NoteEditorSheet>{late final TextEditingController _controller;@override void initState(){super.initState();_controller=TextEditingController(text:widget.note?.content);}@override void dispose(){_controller.dispose();super.dispose();}void _save(){final v=_controller.text.trim();if(v.isNotEmpty)Navigator.of(context).pop(v);}@override Widget build(BuildContext context)=>Padding(padding:EdgeInsets.fromLTRB(20,20,20,MediaQuery.viewInsetsOf(context).bottom+20),child:SafeArea(top:false,child:Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.stretch,children:[Text(itx(context,widget.note==null?'new_research_note':'edit_research_note'),style:Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight:FontWeight.w700)),const SizedBox(height:16),TextField(key:const Key('note_content_field'),controller:_controller,autofocus:true,minLines:4,maxLines:8,textCapitalization:TextCapitalization.sentences,decoration:InputDecoration(labelText:itx(context,'note'),hintText:itx(context,'note_hint'),alignLabelWithHint:true)),const SizedBox(height:16),FilledButton.icon(key:const Key('save_note_button'),onPressed:_save,icon:const Icon(Icons.save_outlined),label:Text(itx(context,widget.note==null?'save_note':'save_changes')))]))));}
-enum _NoteAction{edit,delete}
-class _EmptyNotes extends StatelessWidget{const _EmptyNotes();@override Widget build(BuildContext context)=>Center(child:Padding(padding:const EdgeInsets.all(32),child:Column(mainAxisSize:MainAxisSize.min,children:[Icon(Icons.sticky_note_2_outlined,size:52,color:Theme.of(context).colorScheme.primary),const SizedBox(height:16),Text(itx(context,'no_research_notes'),style:Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight:FontWeight.w700)),const SizedBox(height:8),Text(itx(context,'no_research_notes_desc'),textAlign:TextAlign.center)])));}
-class _NotesError extends StatelessWidget{const _NotesError({required this.message,required this.onRetry});final String message;final VoidCallback onRetry;@override Widget build(BuildContext context)=>Center(child:Column(mainAxisSize:MainAxisSize.min,children:[Text(message),const SizedBox(height:12),OutlinedButton.icon(onPressed:onRetry,icon:const Icon(Icons.refresh),label:Text(itx(context,'try_again')))]));}
+class _NoteEditorSheet extends StatefulWidget {
+  const _NoteEditorSheet({this.note});
+
+  final IdeaNote? note;
+
+  @override
+  State<_NoteEditorSheet> createState() => _NoteEditorSheetState();
+}
+
+class _NoteEditorSheetState extends State<_NoteEditorSheet> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.note?.content);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final value = _controller.text.trim();
+    if (value.isNotEmpty) {
+      Navigator.of(context).pop(value);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        20,
+        20,
+        MediaQuery.viewInsetsOf(context).bottom + 20,
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              itx(
+                context,
+                widget.note == null
+                    ? 'new_research_note'
+                    : 'edit_research_note',
+              ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              key: const Key('note_content_field'),
+              controller: _controller,
+              autofocus: true,
+              minLines: 4,
+              maxLines: 8,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: itx(context, 'note'),
+                hintText: itx(context, 'note_hint'),
+                alignLabelWithHint: true,
+              ),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              key: const Key('save_note_button'),
+              onPressed: _save,
+              icon: const Icon(Icons.save_outlined),
+              label: Text(
+                itx(
+                  context,
+                  widget.note == null ? 'save_note' : 'save_changes',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum _NoteAction { edit, delete }
+
+class _EmptyNotes extends StatelessWidget {
+  const _EmptyNotes();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.sticky_note_2_outlined,
+              size: 52,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              itx(context, 'no_research_notes'),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              itx(context, 'no_research_notes_desc'),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NotesError extends StatelessWidget {
+  const _NotesError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(message),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: Text(itx(context, 'try_again')),
+          ),
+        ],
+      ),
+    );
+  }
+}
