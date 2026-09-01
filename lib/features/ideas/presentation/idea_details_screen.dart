@@ -21,9 +21,9 @@ class IdeaDetailsScreen extends StatelessWidget {
   final IdeaRepository repository;
 
   Future<void> _editIdea(BuildContext context) async {
-    final updatedIdea = await Navigator.of(context).push<Idea>(
-      MaterialPageRoute(builder: (_) => AddIdeaScreen(idea: idea)),
-    );
+    final updatedIdea = await Navigator.of(
+      context,
+    ).push<Idea>(MaterialPageRoute(builder: (_) => AddIdeaScreen(idea: idea)));
     if (!context.mounted || updatedIdea == null) return;
     Navigator.of(context).pop(IdeaUpdatedResult(updatedIdea));
   }
@@ -96,7 +96,10 @@ class IdeaDetailsScreen extends StatelessWidget {
           ),
         ),
         content: Text(
-          tr(dialogContext, restoring ? 'restore_idea_desc' : 'archive_idea_desc'),
+          tr(
+            dialogContext,
+            restoring ? 'restore_idea_desc' : 'archive_idea_desc',
+          ),
         ),
         actions: [
           TextButton(
@@ -438,8 +441,9 @@ class _DetailSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final displayed =
-        content.trim().isEmpty ? tr(context, 'not_added_yet') : content;
+    final displayed = content.trim().isEmpty
+        ? tr(context, 'not_added_yet')
+        : content;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -455,10 +459,9 @@ class _DetailSection extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -490,12 +493,12 @@ class _DateRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        children: [
-          Text(label),
-          const Spacer(),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
-        ],
-      );
+    children: [
+      Text(label),
+      const Spacer(),
+      Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+    ],
+  );
 }
 
 enum _IdeaMenuAction { toggleArchive, delete }

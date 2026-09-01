@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-final ValueNotifier<Locale> ideaRadarLocale = ValueNotifier<Locale>(const Locale('en'));
+final ValueNotifier<Locale> ideaRadarLocale = ValueNotifier<Locale>(
+  const Locale('en'),
+);
 const supportedIdeaRadarLocales = <Locale>[Locale('en'), Locale('ro')];
 
 String tr(BuildContext context, String key) {
@@ -77,13 +79,16 @@ const _translations = <String, Map<String, String>>{
     'select_next_review_date': 'Select next review date',
     'remove_review_date': 'Remove review date',
     'remove_review_date_question': 'Remove review date?',
-    'remove_review_date_desc': 'The idea will no longer appear in the next review schedule.',
+    'remove_review_date_desc':
+        'The idea will no longer appear in the next review schedule.',
     'archive_idea_question': 'Archive idea?',
     'restore_idea_question': 'Restore idea?',
-    'archive_idea_desc': 'The idea will move to the archive. You can restore it later.',
+    'archive_idea_desc':
+        'The idea will move to the archive. You can restore it later.',
     'restore_idea_desc': 'The idea will return to the active dashboard.',
     'delete_idea_question': 'Delete idea?',
-    'delete_idea_desc': 'This idea will be permanently deleted. This action cannot be undone.',
+    'delete_idea_desc':
+        'This idea will be permanently deleted. This action cannot be undone.',
     'ideas_load_error': 'Ideas could not be loaded.',
     'idea_save_error': 'The idea could not be saved.',
     'idea_update_error': 'The idea could not be updated.',
@@ -94,7 +99,8 @@ const _translations = <String, Map<String, String>>{
   'ro': {
     'app_title': 'Idea Tracker',
     'tagline': 'De la idee la oportunitate.',
-    'tagline_detail': 'Capturează, evaluează și dezvoltă ideile pe baza dovezilor.',
+    'tagline_detail':
+        'Capturează, evaluează și dezvoltă ideile pe baza dovezilor.',
     'overview': 'Prezentare generală',
     'all_ideas': 'Toate ideile',
     'validated': 'Validate',
@@ -145,7 +151,8 @@ const _translations = <String, Map<String, String>>{
     'next_experiment': 'Următorul experiment',
     'create_assumption_radar': 'Creează radarul ipotezelor',
     'critical_assumptions': 'Ipoteze critice',
-    'tap_to_change_confidence': 'Atinge o ipoteză pentru a modifica nivelul de încredere',
+    'tap_to_change_confidence':
+        'Atinge o ipoteză pentru a modifica nivelul de încredere',
     'untested': 'Netestat',
     'weak': 'Slab',
     'uncertain': 'Incert',
@@ -157,13 +164,16 @@ const _translations = <String, Map<String, String>>{
     'select_next_review_date': 'Selectează data următoarei revizuiri',
     'remove_review_date': 'Elimină data revizuirii',
     'remove_review_date_question': 'Eliminăm data revizuirii?',
-    'remove_review_date_desc': 'Ideea nu va mai apărea în programul următoarelor revizuiri.',
+    'remove_review_date_desc':
+        'Ideea nu va mai apărea în programul următoarelor revizuiri.',
     'archive_idea_question': 'Arhivăm ideea?',
     'restore_idea_question': 'Restaurăm ideea?',
-    'archive_idea_desc': 'Ideea va fi mutată în arhivă. O poți restaura ulterior.',
+    'archive_idea_desc':
+        'Ideea va fi mutată în arhivă. O poți restaura ulterior.',
     'restore_idea_desc': 'Ideea va reveni în tabloul activ.',
     'delete_idea_question': 'Ștergem ideea?',
-    'delete_idea_desc': 'Ideea va fi ștearsă definitiv. Această acțiune nu poate fi anulată.',
+    'delete_idea_desc':
+        'Ideea va fi ștearsă definitiv. Această acțiune nu poate fi anulată.',
     'ideas_load_error': 'Ideile nu au putut fi încărcate.',
     'idea_save_error': 'Ideea nu a putut fi salvată.',
     'idea_update_error': 'Ideea nu a putut fi actualizată.',

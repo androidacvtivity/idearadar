@@ -72,13 +72,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               (idea.totalScore != null && idea.totalScore! >= minimumScore));
     }).toList();
 
-    visibleIdeas.sort((a, b) => switch (_listOptions.sort) {
-          IdeaSort.updated => b.updatedAt.compareTo(a.updatedAt),
-          IdeaSort.score =>
-            (b.totalScore ?? -1).compareTo(a.totalScore ?? -1),
-          IdeaSort.created => b.createdAt.compareTo(a.createdAt),
-          IdeaSort.nextReview => _compareReviewDates(a, b),
-        });
+    visibleIdeas.sort(
+      (a, b) => switch (_listOptions.sort) {
+        IdeaSort.updated => b.updatedAt.compareTo(a.updatedAt),
+        IdeaSort.score => (b.totalScore ?? -1).compareTo(a.totalScore ?? -1),
+        IdeaSort.created => b.createdAt.compareTo(a.createdAt),
+        IdeaSort.nextReview => _compareReviewDates(a, b),
+      },
+    );
     return visibleIdeas;
   }
 
@@ -90,8 +91,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _addIdea() async {
-    final idea = await Navigator.of(context)
-        .push<Idea>(MaterialPageRoute(builder: (_) => const AddIdeaScreen()));
+    final idea = await Navigator.of(
+      context,
+    ).push<Idea>(MaterialPageRoute(builder: (_) => const AddIdeaScreen()));
     if (!mounted || idea == null) return;
     try {
       await widget.repository.addIdea(idea);
@@ -99,9 +101,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       setState(() => _ideas.insert(0, idea));
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(tr(context, 'idea_save_error'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(tr(context, 'idea_save_error'))));
     }
   }
 
@@ -131,9 +133,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(tr(context, 'idea_update_error'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(tr(context, 'idea_update_error'))));
     }
   }
 
@@ -142,14 +144,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       await widget.repository.deleteIdea(ideaId);
       if (!mounted) return;
       setState(() => _ideas.removeWhere((idea) => idea.id == ideaId));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(tr(context, 'idea_deleted'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(tr(context, 'idea_deleted'))));
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(tr(context, 'idea_delete_error'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(tr(context, 'idea_delete_error'))));
     }
   }
 
@@ -296,7 +298,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 28),
             Text(
               tr(context, 'overview'),
-              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 12),
             Row(
@@ -337,14 +341,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Text(
                     tr(context, 'ideas'),
-                    style: textTheme.titleLarge
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const Spacer(),
                   Text(
                     '${visibleIdeas.length} ${tr(context, 'of')} ${activeIdeas.length}',
-                    style: textTheme.bodyMedium
-                        ?.copyWith(color: colorScheme.onSurfaceVariant),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -373,27 +379,27 @@ class _NoFilterResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            children: [
-              Icon(
-                Icons.filter_alt_off_outlined,
-                size: 44,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 12),
-              Text(tr(context, 'no_filter_results'), textAlign: TextAlign.center),
-              const SizedBox(height: 16),
-              OutlinedButton(
-                key: const Key('clear_idea_filters_button'),
-                onPressed: onClear,
-                child: Text(tr(context, 'clear_filters')),
-              ),
-            ],
+    child: Padding(
+      padding: const EdgeInsets.all(28),
+      child: Column(
+        children: [
+          Icon(
+            Icons.filter_alt_off_outlined,
+            size: 44,
+            color: Theme.of(context).colorScheme.primary,
           ),
-        ),
-      );
+          const SizedBox(height: 12),
+          Text(tr(context, 'no_filter_results'), textAlign: TextAlign.center),
+          const SizedBox(height: 16),
+          OutlinedButton(
+            key: const Key('clear_idea_filters_button'),
+            onPressed: onClear,
+            child: Text(tr(context, 'clear_filters')),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _LoadError extends StatelessWidget {
@@ -403,27 +409,27 @@ class _LoadError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 44,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(height: 12),
-              Text(message, textAlign: TextAlign.center),
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: Text(tr(context, 'try_again')),
-              ),
-            ],
+    child: Padding(
+      padding: const EdgeInsets.all(28),
+      child: Column(
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 44,
+            color: Theme.of(context).colorScheme.error,
           ),
-        ),
-      );
+          const SizedBox(height: 12),
+          Text(message, textAlign: TextAlign.center),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: Text(tr(context, 'try_again')),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _EmptyState extends StatelessWidget {
@@ -526,24 +532,23 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: color),
-              const SizedBox(height: 12),
-              Text(
-                value,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 4),
-              Text(label),
-            ],
+    child: Padding(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
           ),
-        ),
-      );
+          const SizedBox(height: 4),
+          Text(label),
+        ],
+      ),
+    ),
+  );
 }
