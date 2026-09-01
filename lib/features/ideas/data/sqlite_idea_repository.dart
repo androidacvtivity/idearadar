@@ -1,6 +1,7 @@
 import 'package:idearadar/features/ideas/data/idea_database.dart';
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
+import 'package:idearadar/features/ideas/domain/idea_assumption.dart';
 import 'package:idearadar/features/ideas/domain/idea_evaluation.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 import 'package:idearadar/features/ideas/domain/idea_source.dart';
@@ -155,6 +156,86 @@ class SqliteIdeaRepository implements IdeaRepository {
     if (deletedRows != 1) {
       throw StateError('Source not found: $sourceId');
     }
+  }
+
+  @override
+  Future<List<IdeaAssumption>> getAssumptions(String ideaId) async {
+    final database = await _ideaDatabase.database;
+    final records = await database.query(
+      IdeaDatabase.assumptionsTable,
+      where: 'idea_id = ?',
+      whereArgs: [ideaId],
+      orderBy: 'is_critical DESC, rowid ASC',
+    );
+    return records.map(_assumptionFromMap).toList(growable: false);
+  }
+
+  @override
+  Future<void> addAssumption(IdeaAssumption assumption) async {
+    final database = await _ideaDatabase.database;
+    await database.insert(
+      IdeaDatabase.assumptionsTable,
+      _assumptionToMap(assumption),
+    );
+  }
+
+  @override
+  Future<void> updateAssumption(IdeaAssumption assumption) async {
+    final database = await _ideaDatabase.database;
+    final updatedRows = await database.update(
+      IdeaDatabase.assumptionsTable,
+      _assumptionToMap(assumption),
+      where: 'id = ?',
+      whereArgs: [assumption.id],
+    );
+    if (updatedRows != 1) {
+      throw StateError('Assumption not found: ${assumption.id}');
+    }
+  }
+
+  @override
+  Future<void> deleteAssumption(String assumptionId) async {
+    final database = await _ideaDatabase.database;
+    final deletedRows = await database.delete(
+      IdeaDatabase.assumptionsTable,
+      where: 'id = ?',
+      whereArgs: [assumptionId],
+    );
+    if (deletedRows != 1) {
+      throw StateError('Assumption not found: $assumptionId');
+    }
+  }
+
+  Map<String, Object?> _assumptionToMap(IdeaAssumption assumption) {
+    return {
+      'id': assumption.id,
+      'idea_id': assumption.ideaId,
+      'title': assumption.title,
+      'assumption_type': assumption.type.name,
+      'confidence': assumption.confidence.name,
+      'evidence_count': assumption.evidenceCount,
+      'next_experiment': assumption.nextExperiment,
+      'is_critical': assumption.isCritical ? 1 : 0,
+    };
+  }
+
+  IdeaAssumption _assumptionFromMap(Map<String, Object?> map) {
+    return IdeaAssumption(
+      id: map['id']! as String,
+      ideaId: map['idea_id']! as String,
+      title: map['title']! as String,
+      type: IdeaAssumptionType.values.firstWhere(
+        (type) => type.name == map['assumption_type'],
+        orElse: () => IdeaAssumptionType.custom,
+      ),
+      confidence: AssumptionConfidence.values.firstWhere(
+        (confidence) => confidence.name == map['confidence'],
+        orElse: () => AssumptionConfidence.untested,
+      ),
+      evidenceCount: map['evidence_count']! as int,
+      nextExperiment: map['next_experiment'] as String?,
+      isCritical: (map['is_critical']! as int) == 1,
+    );
   }
 
   Map<String, Object?> _sourceToMap(IdeaSource source) {

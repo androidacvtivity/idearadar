@@ -3,10 +3,11 @@ import 'package:sqflite/sqflite.dart';
 
 class IdeaDatabase {
   static const databaseName = 'idearadar.db';
-  static const databaseVersion = 3;
+  static const databaseVersion = 4;
   static const ideasTable = 'ideas';
   static const notesTable = 'idea_notes';
   static const sourcesTable = 'idea_sources';
+  static const assumptionsTable = 'idea_assumptions';
 
   Database? _database;
 
@@ -28,6 +29,7 @@ class IdeaDatabase {
         await _createIdeasTable(database);
         await _createNotesTable(database);
         await _createSourcesTable(database);
+        await _createAssumptionsTable(database);
       },
       onUpgrade: (database, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -35,6 +37,9 @@ class IdeaDatabase {
         }
         if (oldVersion < 3) {
           await _createSourcesTable(database);
+        }
+        if (oldVersion < 4) {
+          await _createAssumptionsTable(database);
         }
       },
     );
@@ -93,6 +98,22 @@ class IdeaDatabase {
         note TEXT NOT NULL DEFAULT '',
         accessed_at TEXT NOT NULL,
         created_at TEXT NOT NULL,
+        FOREIGN KEY (idea_id) REFERENCES $ideasTable (id) ON DELETE CASCADE
+      )
+    ''');
+  }
+
+  static Future<void> _createAssumptionsTable(Database database) {
+    return database.execute('''
+      CREATE TABLE $assumptionsTable (
+        id TEXT PRIMARY KEY,
+        idea_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        assumption_type TEXT NOT NULL,
+        confidence TEXT NOT NULL,
+        evidence_count INTEGER NOT NULL DEFAULT 0,
+        next_experiment TEXT,
+        is_critical INTEGER NOT NULL DEFAULT 1,
         FOREIGN KEY (idea_id) REFERENCES $ideasTable (id) ON DELETE CASCADE
       )
     ''');

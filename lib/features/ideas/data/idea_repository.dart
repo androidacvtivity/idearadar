@@ -1,4 +1,5 @@
 import 'package:idearadar/features/ideas/domain/idea.dart';
+import 'package:idearadar/features/ideas/domain/idea_assumption.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 import 'package:idearadar/features/ideas/domain/idea_source.dart';
 
@@ -28,4 +29,12 @@ abstract interface class IdeaRepository {
   Future<void> updateSource(IdeaSource source);
 
   Future<void> deleteSource(String sourceId);
+
+  Future<List<IdeaAssumption>> getAssumptions(String ideaId);
+
+  Future<void> addAssumption(IdeaAssumption assumption);
+
+  Future<void> updateAssumption(IdeaAssumption assumption);
+
+  Future<void> deleteAssumption(String assumptionId);
 }

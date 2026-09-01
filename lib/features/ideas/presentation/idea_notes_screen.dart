@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:idearadar/app/localization/app_localization.dart';
+import 'package:idearadar/app/localization/idea_localization.dart';
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 
@@ -30,10 +32,7 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
   Future<void> _loadNotes() async {
     try {
       final notes = await widget.repository.getNotes(widget.ideaId);
-      if (!mounted) {
-        return;
-      }
-
+      if (!mounted) return;
       setState(() {
         _notes
           ..clear()
@@ -42,13 +41,10 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
         _error = null;
       });
     } catch (_) {
-      if (!mounted) {
-        return;
-      }
-
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error = 'Notes could not be loaded.';
+        _error = itx(context, 'notes_load_error');
       });
     }
   }
@@ -59,10 +55,7 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
       isScrollControlled: true,
       builder: (_) => _NoteEditorSheet(note: note),
     );
-
-    if (!mounted || content == null) {
-      return;
-    }
+    if (!mounted || content == null) return;
 
     final now = DateTime.now();
     try {
@@ -75,30 +68,22 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
           updatedAt: now,
         );
         await widget.repository.addNote(newNote);
-        if (!mounted) {
-          return;
-        }
+        if (!mounted) return;
         setState(() => _notes.insert(0, newNote));
       } else {
-        final updatedNote = note.copyWith(content: content, updatedAt: now);
-        await widget.repository.updateNote(updatedNote);
-        if (!mounted) {
-          return;
-        }
+        final updated = note.copyWith(content: content, updatedAt: now);
+        await widget.repository.updateNote(updated);
+        if (!mounted) return;
         setState(() {
           final index = _notes.indexWhere((current) => current.id == note.id);
-          if (index != -1) {
-            _notes[index] = updatedNote;
-          }
+          if (index != -1) _notes[index] = updated;
         });
       }
     } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('The note could not be saved.')),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(itx(context, 'note_save_error'))));
     }
   }
 
@@ -106,37 +91,30 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete note?'),
-        content: const Text('This research note will be permanently deleted.'),
+        title: Text(itx(dialogContext, 'delete_note_question')),
+        content: Text(itx(dialogContext, 'delete_note_desc')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
+            child: Text(tr(dialogContext, 'cancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Delete'),
+            child: Text(tr(dialogContext, 'delete')),
           ),
         ],
       ),
     );
-
-    if (!mounted || confirmed != true) {
-      return;
-    }
+    if (!mounted || confirmed != true) return;
 
     try {
       await widget.repository.deleteNote(note.id);
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       setState(() => _notes.removeWhere((current) => current.id == note.id));
     } catch (_) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('The note could not be deleted.')),
+        SnackBar(content: Text(itx(context, 'note_delete_error'))),
       );
     }
   }
@@ -144,7 +122,7 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Research notes')),
+      appBar: AppBar(title: Text(tr(context, 'research_notes'))),
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -178,7 +156,7 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
                             ),
                           ),
                           PopupMenuButton<_NoteAction>(
-                            tooltip: 'Note actions',
+                            tooltip: itx(context, 'note_actions'),
                             onSelected: (action) {
                               switch (action) {
                                 case _NoteAction.edit:
@@ -187,14 +165,14 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
                                   _deleteNote(note);
                               }
                             },
-                            itemBuilder: (_) => const [
+                            itemBuilder: (_) => [
                               PopupMenuItem(
                                 value: _NoteAction.edit,
-                                child: Text('Edit'),
+                                child: Text(itx(context, 'edit')),
                               ),
                               PopupMenuItem(
                                 value: _NoteAction.delete,
-                                child: Text('Delete'),
+                                child: Text(itx(context, 'delete')),
                               ),
                             ],
                           ),
@@ -208,7 +186,7 @@ class _IdeaNotesScreenState extends State<IdeaNotesScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openNoteEditor,
         icon: const Icon(Icons.note_add_outlined),
-        label: const Text('New note'),
+        label: Text(itx(context, 'new_note')),
       ),
     );
   }
@@ -269,7 +247,12 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              widget.note == null ? 'New research note' : 'Edit research note',
+              itx(
+                context,
+                widget.note == null
+                    ? 'new_research_note'
+                    : 'edit_research_note',
+              ),
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
@@ -282,9 +265,9 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
               minLines: 4,
               maxLines: 8,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Note',
-                hintText: 'Add an observation, assumption, or research finding',
+              decoration: InputDecoration(
+                labelText: itx(context, 'note'),
+                hintText: itx(context, 'note_hint'),
                 alignLabelWithHint: true,
               ),
             ),
@@ -293,7 +276,12 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
               key: const Key('save_note_button'),
               onPressed: _save,
               icon: const Icon(Icons.save_outlined),
-              label: Text(widget.note == null ? 'Save note' : 'Save changes'),
+              label: Text(
+                itx(
+                  context,
+                  widget.note == null ? 'save_note' : 'save_changes',
+                ),
+              ),
             ),
           ],
         ),
@@ -322,14 +310,14 @@ class _EmptyNotes extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No research notes yet',
+              itx(context, 'no_research_notes'),
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Record assumptions, observations, and findings as the idea develops.',
+            Text(
+              itx(context, 'no_research_notes_desc'),
               textAlign: TextAlign.center,
             ),
           ],
@@ -356,7 +344,7 @@ class _NotesError extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh),
-            label: const Text('Try again'),
+            label: Text(itx(context, 'try_again')),
           ),
         ],
       ),

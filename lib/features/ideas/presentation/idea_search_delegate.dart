@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:idearadar/app/localization/app_localization.dart';
+import 'package:idearadar/app/localization/idea_localization.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
-import 'package:idearadar/features/ideas/domain/idea_status.dart';
 
 class IdeaSearchDelegate extends SearchDelegate<Idea?> {
   IdeaSearchDelegate({required this.ideas});
@@ -8,46 +9,40 @@ class IdeaSearchDelegate extends SearchDelegate<Idea?> {
   final List<Idea> ideas;
 
   @override
-  String get searchFieldLabel => 'Search ideas';
+  String get searchFieldLabel => ideaRadarLocale.value.languageCode == 'ro'
+      ? 'Caută idei'
+      : 'Search ideas';
 
   @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      if (query.isNotEmpty)
-        IconButton(
-          onPressed: () => query = '',
-          tooltip: 'Clear search',
-          icon: const Icon(Icons.clear),
-        ),
-    ];
-  }
+  List<Widget> buildActions(BuildContext context) => [
+    if (query.isNotEmpty)
+      IconButton(
+        onPressed: () => query = '',
+        tooltip: itx(context, 'clear_search'),
+        icon: const Icon(Icons.clear),
+      ),
+  ];
 
   @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      onPressed: () => close(context, null),
-      tooltip: 'Close search',
-      icon: const Icon(Icons.arrow_back),
-    );
-  }
+  Widget buildLeading(BuildContext context) => IconButton(
+    onPressed: () => close(context, null),
+    tooltip: itx(context, 'close_search'),
+    icon: const Icon(Icons.arrow_back),
+  );
 
   @override
-  Widget buildResults(BuildContext context) {
-    return _SearchResults(
-      query: query,
-      ideas: _matchingIdeas,
-      onSelected: (idea) => close(context, idea),
-    );
-  }
+  Widget buildResults(BuildContext context) => _SearchResults(
+    query: query,
+    ideas: _matchingIdeas,
+    onSelected: (idea) => close(context, idea),
+  );
 
   @override
-  Widget buildSuggestions(BuildContext context) {
-    return _SearchResults(
-      query: query,
-      ideas: _matchingIdeas,
-      onSelected: (idea) => close(context, idea),
-    );
-  }
+  Widget buildSuggestions(BuildContext context) => _SearchResults(
+    query: query,
+    ideas: _matchingIdeas,
+    onSelected: (idea) => close(context, idea),
+  );
 
   List<Idea> get _matchingIdeas {
     final normalizedQuery = query.trim().toLowerCase();
@@ -60,14 +55,13 @@ class IdeaSearchDelegate extends SearchDelegate<Idea?> {
           final searchableText = [
             idea.title,
             idea.domain,
-            idea.status.label,
+            idea.status.name,
             idea.summary,
             idea.problem,
             idea.solution,
             idea.targetUsers,
             idea.payingCustomer,
           ].join(' ').toLowerCase();
-
           return searchableText.contains(normalizedQuery);
         })
         .toList(growable: false);
@@ -101,16 +95,19 @@ class _SearchResults extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'No ideas found',
+                itx(context, 'no_ideas_found'),
                 style: Theme.of(
                   context,
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 6),
               Text(
-                query.trim().isEmpty
-                    ? 'Add an idea to start searching.'
-                    : 'Try another title, domain, status, or keyword.',
+                itx(
+                  context,
+                  query.trim().isEmpty
+                      ? 'search_empty_desc'
+                      : 'search_no_results_desc',
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -131,7 +128,7 @@ class _SearchResults extends StatelessWidget {
           leading: const Icon(Icons.lightbulb_outline),
           title: Text(idea.title, maxLines: 2, overflow: TextOverflow.ellipsis),
           subtitle: Text(
-            '${idea.domain} · ${idea.status.label}',
+            '${idea.domain} · ${localizedIdeaStatus(context, idea.status)}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

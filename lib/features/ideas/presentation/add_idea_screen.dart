@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:idearadar/app/localization/app_localization.dart';
+import 'package:idearadar/app/localization/idea_localization.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 
@@ -27,12 +29,8 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
   @override
   void initState() {
     super.initState();
-
     final idea = widget.idea;
-    if (idea == null) {
-      return;
-    }
-
+    if (idea == null) return;
     _titleController.text = idea.title;
     _summaryController.text = idea.summary;
     _problemController.text = idea.problem;
@@ -55,46 +53,38 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
     super.dispose();
   }
 
-  void _dismissKeyboard() {
-    FocusManager.instance.primaryFocus?.unfocus();
-  }
+  void _dismissKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
 
   void _saveIdea() {
     _dismissKeyboard();
-
-    setState(() {
-      _showValidationErrors = true;
-    });
-
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    setState(() => _showValidationErrors = true);
+    if (!_formKey.currentState!.validate()) return;
 
     final now = DateTime.now();
     final originalIdea = widget.idea;
-    final idea = Idea(
-      id: originalIdea?.id ?? now.microsecondsSinceEpoch.toString(),
-      title: _titleController.text.trim(),
-      summary: _summaryController.text.trim(),
-      problem: _problemController.text.trim(),
-      solution: _solutionController.text.trim(),
-      domain: _domainController.text.trim(),
-      targetUsers: _targetUsersController.text.trim(),
-      payingCustomer: _payingCustomerController.text.trim(),
-      status: _status,
-      evaluation: originalIdea?.evaluation,
-      createdAt: originalIdea?.createdAt ?? now,
-      updatedAt: now,
-      nextReviewAt: originalIdea?.nextReviewAt,
-      archivedAt: originalIdea?.archivedAt,
+    Navigator.of(context).pop(
+      Idea(
+        id: originalIdea?.id ?? now.microsecondsSinceEpoch.toString(),
+        title: _titleController.text.trim(),
+        summary: _summaryController.text.trim(),
+        problem: _problemController.text.trim(),
+        solution: _solutionController.text.trim(),
+        domain: _domainController.text.trim(),
+        targetUsers: _targetUsersController.text.trim(),
+        payingCustomer: _payingCustomerController.text.trim(),
+        status: _status,
+        evaluation: originalIdea?.evaluation,
+        createdAt: originalIdea?.createdAt ?? now,
+        updatedAt: now,
+        nextReviewAt: originalIdea?.nextReviewAt,
+        archivedAt: originalIdea?.archivedAt,
+      ),
     );
-
-    Navigator.of(context).pop(idea);
   }
 
   String? _requiredValidator(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
-      return '$fieldName is required';
+      return '$fieldName ${itx(context, 'required')}';
     }
     return null;
   }
@@ -102,9 +92,12 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.idea != null;
-
     return Scaffold(
-      appBar: AppBar(title: Text(isEditing ? 'Edit idea' : 'Add new idea')),
+      appBar: AppBar(
+        title: Text(
+          isEditing ? tr(context, 'edit_idea') : itx(context, 'add_new_idea'),
+        ),
+      ),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: _dismissKeyboard,
@@ -119,18 +112,22 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
               children: [
                 Text(
-                  isEditing
-                      ? 'Update the opportunity'
-                      : 'Capture the opportunity',
+                  itx(
+                    context,
+                    isEditing ? 'update_opportunity' : 'capture_opportunity',
+                  ),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  isEditing
-                      ? 'Keep the idea accurate as your research develops.'
-                      : 'Start with the problem. You can add evidence and scores later.',
+                  itx(
+                    context,
+                    isEditing
+                        ? 'update_opportunity_desc'
+                        : 'capture_opportunity_desc',
+                  ),
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -141,12 +138,13 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                   controller: _titleController,
                   textCapitalization: TextCapitalization.sentences,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Title',
-                    hintText: 'Example: IdeaRadar',
-                    prefixIcon: Icon(Icons.lightbulb_outline),
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'title'),
+                    hintText: itx(context, 'title_hint'),
+                    prefixIcon: const Icon(Icons.lightbulb_outline),
                   ),
-                  validator: (value) => _requiredValidator(value, 'Title'),
+                  validator: (value) =>
+                      _requiredValidator(value, itx(context, 'title')),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -154,35 +152,32 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                   controller: _domainController,
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Domain',
-                    hintText: 'Example: Productivity',
-                    prefixIcon: Icon(Icons.category_outlined),
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'domain'),
+                    hintText: itx(context, 'domain_hint'),
+                    prefixIcon: const Icon(Icons.category_outlined),
                   ),
-                  validator: (value) => _requiredValidator(value, 'Domain'),
+                  validator: (value) =>
+                      _requiredValidator(value, itx(context, 'domain')),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<IdeaStatus>(
                   key: const Key('idea_status_field'),
                   initialValue: _status,
-                  decoration: const InputDecoration(
-                    labelText: 'Status',
-                    prefixIcon: Icon(Icons.flag_outlined),
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'status'),
+                    prefixIcon: const Icon(Icons.flag_outlined),
                   ),
                   items: IdeaStatus.values
                       .map(
                         (status) => DropdownMenuItem(
                           value: status,
-                          child: Text(status.label),
+                          child: Text(localizedIdeaStatus(context, status)),
                         ),
                       )
                       .toList(),
                   onChanged: (status) {
-                    if (status != null) {
-                      setState(() {
-                        _status = status;
-                      });
-                    }
+                    if (status != null) setState(() => _status = status);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -193,9 +188,9 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                   textInputAction: TextInputAction.next,
                   minLines: 2,
                   maxLines: 4,
-                  decoration: const InputDecoration(
-                    labelText: 'Summary',
-                    hintText: 'Describe the idea in a few sentences',
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'summary'),
+                    hintText: itx(context, 'summary_hint'),
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -207,9 +202,9 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                   textInputAction: TextInputAction.next,
                   minLines: 3,
                   maxLines: 6,
-                  decoration: const InputDecoration(
-                    labelText: 'Problem',
-                    hintText: 'What problem does this idea solve?',
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'problem'),
+                    hintText: itx(context, 'problem_hint'),
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -221,9 +216,9 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                   textInputAction: TextInputAction.next,
                   minLines: 3,
                   maxLines: 6,
-                  decoration: const InputDecoration(
-                    labelText: 'Proposed solution',
-                    hintText: 'How could the problem be solved?',
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'proposed_solution'),
+                    hintText: itx(context, 'solution_hint'),
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -235,11 +230,10 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                   textInputAction: TextInputAction.next,
                   minLines: 2,
                   maxLines: 4,
-                  decoration: const InputDecoration(
-                    labelText: 'Target users',
-                    hintText:
-                        'Who experiences the problem and uses the solution?',
-                    prefixIcon: Icon(Icons.groups_outlined),
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'target_users'),
+                    hintText: itx(context, 'target_users_hint'),
+                    prefixIcon: const Icon(Icons.groups_outlined),
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -252,10 +246,10 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
                   onFieldSubmitted: (_) => _dismissKeyboard(),
                   minLines: 2,
                   maxLines: 4,
-                  decoration: const InputDecoration(
-                    labelText: 'Paying customer',
-                    hintText: 'Who decides to buy or fund the solution?',
-                    prefixIcon: Icon(Icons.payments_outlined),
+                  decoration: InputDecoration(
+                    labelText: tr(context, 'paying_customer'),
+                    hintText: itx(context, 'paying_customer_hint'),
+                    prefixIcon: const Icon(Icons.payments_outlined),
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -270,7 +264,7 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
           key: const Key('save_idea_button'),
           onPressed: _saveIdea,
           icon: const Icon(Icons.save_outlined),
-          label: Text(isEditing ? 'Save changes' : 'Save idea'),
+          label: Text(itx(context, isEditing ? 'save_changes' : 'save_idea')),
         ),
       ),
     );

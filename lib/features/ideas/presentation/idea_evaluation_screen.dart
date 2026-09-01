@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:idearadar/app/localization/app_localization.dart';
+import 'package:idearadar/app/localization/idea_localization.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_evaluation.dart';
 
 class IdeaEvaluationScreen extends StatefulWidget {
   const IdeaEvaluationScreen({required this.idea, super.key});
-
   final Idea idea;
-
   @override
   State<IdeaEvaluationScreen> createState() => _IdeaEvaluationScreenState();
 }
 
 class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
   final _rationaleController = TextEditingController();
-
-  int _problemScore = 3;
-  int _marketScore = 3;
-  int _demandScore = 3;
-  int _competitionScore = 3;
-  int _dataAccessScore = 3;
-  int _technicalFeasibilityScore = 3;
-  int _monetizationScore = 3;
-  int _firstClientScore = 3;
-
+  int _problemScore = 3,
+      _marketScore = 3,
+      _demandScore = 3,
+      _competitionScore = 3,
+      _dataAccessScore = 3,
+      _technicalFeasibilityScore = 3,
+      _monetizationScore = 3,
+      _firstClientScore = 3;
   int get _totalScore =>
       _problemScore +
       _marketScore +
@@ -36,21 +34,17 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
   @override
   void initState() {
     super.initState();
-
-    final evaluation = widget.idea.evaluation;
-    if (evaluation == null) {
-      return;
-    }
-
-    _problemScore = evaluation.problemScore;
-    _marketScore = evaluation.marketScore;
-    _demandScore = evaluation.demandScore;
-    _competitionScore = evaluation.competitionScore;
-    _dataAccessScore = evaluation.dataAccessScore;
-    _technicalFeasibilityScore = evaluation.technicalFeasibilityScore;
-    _monetizationScore = evaluation.monetizationScore;
-    _firstClientScore = evaluation.firstClientScore;
-    _rationaleController.text = evaluation.rationale;
+    final e = widget.idea.evaluation;
+    if (e == null) return;
+    _problemScore = e.problemScore;
+    _marketScore = e.marketScore;
+    _demandScore = e.demandScore;
+    _competitionScore = e.competitionScore;
+    _dataAccessScore = e.dataAccessScore;
+    _technicalFeasibilityScore = e.technicalFeasibilityScore;
+    _monetizationScore = e.monetizationScore;
+    _firstClientScore = e.firstClientScore;
+    _rationaleController.text = e.rationale;
   }
 
   @override
@@ -59,14 +53,10 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
     super.dispose();
   }
 
-  void _dismissKeyboard() {
-    FocusManager.instance.primaryFocus?.unfocus();
-  }
-
+  void _dismissKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
   void _saveEvaluation() {
     _dismissKeyboard();
-
-    final evaluation = IdeaEvaluation(
+    final e = IdeaEvaluation(
       problemScore: _problemScore,
       marketScore: _marketScore,
       demandScore: _demandScore,
@@ -77,20 +67,20 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
       firstClientScore: _firstClientScore,
       rationale: _rationaleController.text.trim(),
     );
-
-    Navigator.of(context).pop(
-      widget.idea.copyWith(evaluation: evaluation, updatedAt: DateTime.now()),
-    );
+    Navigator.of(
+      context,
+    ).pop(widget.idea.copyWith(evaluation: e, updatedAt: DateTime.now()));
   }
 
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.idea.evaluation != null;
-    final colorScheme = Theme.of(context).colorScheme;
-
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit evaluation' : 'Evaluate idea'),
+        title: Text(
+          itx(context, isEditing ? 'edit_evaluation' : 'evaluate_idea'),
+        ),
       ),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
@@ -104,20 +94,20 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
                 key: const Key('evaluation_score_header'),
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer,
+                  color: cs.primaryContainer,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final textScaler = MediaQuery.textScalerOf(context);
-                    final useStackedLayout =
-                        constraints.maxWidth < 330 || textScaler.scale(1) > 1.2;
+                    final stacked =
+                        constraints.maxWidth < 330 ||
+                        MediaQuery.textScalerOf(context).scale(1) > 1.2;
                     final score = Text(
                       '$_totalScore/40',
                       key: const Key('evaluation_total_score'),
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
-                            color: colorScheme.onPrimaryContainer,
+                            color: cs.onPrimaryContainer,
                             fontWeight: FontWeight.w800,
                           ),
                     );
@@ -127,7 +117,7 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
                         Icon(
                           Icons.analytics_outlined,
                           size: 36,
-                          color: colorScheme.onPrimaryContainer,
+                          color: cs.onPrimaryContainer,
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -135,99 +125,96 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Opportunity score',
+                                tr(context, 'opportunity_score'),
                                 key: const Key('evaluation_score_title'),
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(
-                                      color: colorScheme.onPrimaryContainer,
+                                      color: cs.onPrimaryContainer,
                                       fontWeight: FontWeight.w700,
                                     ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Adjust each criterion from 1 to 5.',
+                                itx(context, 'adjust_criterion'),
                                 key: const Key('evaluation_score_explanation'),
-                                style: TextStyle(
-                                  color: colorScheme.onPrimaryContainer,
-                                ),
+                                style: TextStyle(color: cs.onPrimaryContainer),
                               ),
                             ],
                           ),
                         ),
                       ],
                     );
-
-                    if (useStackedLayout) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          summary,
-                          const SizedBox(height: 12),
-                          Align(alignment: Alignment.centerRight, child: score),
-                        ],
-                      );
-                    }
-
-                    return Row(
-                      children: [
-                        Expanded(child: summary),
-                        const SizedBox(width: 16),
-                        score,
-                      ],
-                    );
+                    return stacked
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              summary,
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: score,
+                              ),
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              Expanded(child: summary),
+                              const SizedBox(width: 16),
+                              score,
+                            ],
+                          );
                   },
                 ),
               ),
               const SizedBox(height: 20),
               _ScoreControl(
-                label: 'Problem severity',
-                description: 'How important and frequent is the problem?',
+                label: itx(context, 'problem_severity'),
+                description: itx(context, 'problem_severity_desc'),
                 value: _problemScore,
-                onChanged: (value) => setState(() => _problemScore = value),
+                onChanged: (v) => setState(() => _problemScore = v),
               ),
               _ScoreControl(
-                label: 'Market potential',
-                description: 'How large and reachable is the market?',
+                label: itx(context, 'market_potential'),
+                description: itx(context, 'market_potential_desc'),
                 value: _marketScore,
-                onChanged: (value) => setState(() => _marketScore = value),
+                onChanged: (v) => setState(() => _marketScore = v),
               ),
               _ScoreControl(
-                label: 'Demand evidence',
-                description: 'How strong is the evidence of real demand?',
+                label: itx(context, 'demand_evidence'),
+                description: itx(context, 'demand_evidence_desc'),
                 value: _demandScore,
-                onChanged: (value) => setState(() => _demandScore = value),
+                onChanged: (v) => setState(() => _demandScore = v),
               ),
               _ScoreControl(
-                label: 'Competition favorability',
-                description: '5 means lower competition and a better position.',
+                label: itx(context, 'competition_favorability'),
+                description: itx(context, 'competition_favorability_desc'),
                 value: _competitionScore,
-                onChanged: (value) => setState(() => _competitionScore = value),
+                onChanged: (v) => setState(() => _competitionScore = v),
               ),
               _ScoreControl(
-                label: 'Data access',
-                description: 'Can the required data be obtained legally?',
+                label: itx(context, 'data_access'),
+                description: itx(context, 'data_access_desc'),
                 value: _dataAccessScore,
-                onChanged: (value) => setState(() => _dataAccessScore = value),
+                onChanged: (v) => setState(() => _dataAccessScore = v),
               ),
               _ScoreControl(
-                label: 'Technical feasibility',
-                description: 'Can the MVP be built with available resources?',
+                label: itx(context, 'technical_feasibility'),
+                description: itx(context, 'technical_feasibility_desc'),
                 value: _technicalFeasibilityScore,
-                onChanged: (value) =>
-                    setState(() => _technicalFeasibilityScore = value),
+                onChanged: (v) =>
+                    setState(() => _technicalFeasibilityScore = v),
               ),
               _ScoreControl(
-                label: 'Monetization potential',
-                description: 'Is there a credible paying customer or model?',
+                label: itx(context, 'monetization_potential'),
+                description: itx(context, 'monetization_potential_desc'),
                 value: _monetizationScore,
-                onChanged: (value) =>
-                    setState(() => _monetizationScore = value),
+                onChanged: (v) => setState(() => _monetizationScore = v),
               ),
               _ScoreControl(
-                label: 'Access to first client',
-                description: 'How easily can the first client be reached?',
+                label: itx(context, 'first_client_access'),
+                description: itx(context, 'first_client_access_desc'),
                 value: _firstClientScore,
-                onChanged: (value) => setState(() => _firstClientScore = value),
+                onChanged: (v) => setState(() => _firstClientScore = v),
               ),
               const SizedBox(height: 8),
               TextField(
@@ -238,11 +225,11 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
                 textCapitalization: TextCapitalization.sentences,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (_) => _dismissKeyboard(),
-                decoration: const InputDecoration(
-                  labelText: 'Evaluation rationale',
-                  hintText: 'Record the evidence behind the scores',
+                decoration: InputDecoration(
+                  labelText: itx(context, 'evaluation_rationale'),
+                  hintText: itx(context, 'evaluation_rationale_hint'),
                   alignLabelWithHint: true,
-                  prefixIcon: Icon(Icons.notes_outlined),
+                  prefixIcon: const Icon(Icons.notes_outlined),
                 ),
               ),
             ],
@@ -256,7 +243,10 @@ class _IdeaEvaluationScreenState extends State<IdeaEvaluationScreen> {
           onPressed: _saveEvaluation,
           icon: const Icon(Icons.save_outlined),
           label: Text(
-            isEditing ? 'Save evaluation changes' : 'Save evaluation',
+            itx(
+              context,
+              isEditing ? 'save_evaluation_changes' : 'save_evaluation',
+            ),
           ),
         ),
       ),
@@ -271,16 +261,12 @@ class _ScoreControl extends StatelessWidget {
     required this.value,
     required this.onChanged,
   });
-
-  final String label;
-  final String description;
+  final String label, description;
   final int value;
   final ValueChanged<int> onChanged;
-
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
+    final cs = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -303,13 +289,13 @@ class _ScoreControl extends StatelessWidget {
                   height: 36,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
+                    color: cs.primaryContainer,
                     shape: BoxShape.circle,
                   ),
                   child: Text(
                     '$value',
                     style: TextStyle(
-                      color: colorScheme.onPrimaryContainer,
+                      color: cs.onPrimaryContainer,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -317,17 +303,14 @@ class _ScoreControl extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Text(
-              description,
-              style: TextStyle(color: colorScheme.onSurfaceVariant),
-            ),
+            Text(description, style: TextStyle(color: cs.onSurfaceVariant)),
             Slider(
               value: value.toDouble(),
               min: 1,
               max: 5,
               divisions: 4,
               label: '$value',
-              onChanged: (newValue) => onChanged(newValue.round()),
+              onChanged: (v) => onChanged(v.round()),
             ),
           ],
         ),

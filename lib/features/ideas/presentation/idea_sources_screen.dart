@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:idearadar/app/localization/app_localization.dart';
+import 'package:idearadar/app/localization/idea_localization.dart';
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea_source.dart';
 
@@ -30,9 +32,7 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
   Future<void> _loadSources() async {
     try {
       final sources = await widget.repository.getSources(widget.ideaId);
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       setState(() {
         _sources
           ..clear()
@@ -41,55 +41,42 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
         _error = null;
       });
     } catch (_) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error = 'Sources could not be loaded.';
+        _error = itx(context, 'sources_load_error');
       });
     }
   }
 
   Future<void> _openEditor([IdeaSource? source]) async {
-    final savedSource = await Navigator.of(context).push<IdeaSource>(
+    final saved = await Navigator.of(context).push<IdeaSource>(
       MaterialPageRoute(
         builder: (_) =>
             _SourceEditorScreen(ideaId: widget.ideaId, source: source),
       ),
     );
-
-    if (!mounted || savedSource == null) {
-      return;
-    }
+    if (!mounted || saved == null) return;
 
     try {
       if (source == null) {
-        await widget.repository.addSource(savedSource);
-        if (!mounted) {
-          return;
-        }
-        setState(() => _sources.insert(0, savedSource));
+        await widget.repository.addSource(saved);
+        if (!mounted) return;
+        setState(() => _sources.insert(0, saved));
       } else {
-        await widget.repository.updateSource(savedSource);
-        if (!mounted) {
-          return;
-        }
+        await widget.repository.updateSource(saved);
+        if (!mounted) return;
         setState(() {
           final index = _sources.indexWhere(
-            (current) => current.id == savedSource.id,
+            (current) => current.id == saved.id,
           );
-          if (index != -1) {
-            _sources[index] = savedSource;
-          }
+          if (index != -1) _sources[index] = saved;
         });
       }
     } catch (_) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('The source could not be saved.')),
+        SnackBar(content: Text(itx(context, 'source_save_error'))),
       );
     }
   }
@@ -98,39 +85,32 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete source?'),
-        content: Text('“${source.title}” will be permanently deleted.'),
+        title: Text(itx(dialogContext, 'delete_source_question')),
+        content: Text(itx(dialogContext, 'delete_source_desc')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
+            child: Text(tr(dialogContext, 'cancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Delete'),
+            child: Text(tr(dialogContext, 'delete')),
           ),
         ],
       ),
     );
-
-    if (!mounted || confirmed != true) {
-      return;
-    }
+    if (!mounted || confirmed != true) return;
 
     try {
       await widget.repository.deleteSource(source.id);
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _sources.removeWhere((current) => current.id == source.id);
-      });
+      if (!mounted) return;
+      setState(
+        () => _sources.removeWhere((current) => current.id == source.id),
+      );
     } catch (_) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('The source could not be deleted.')),
+        SnackBar(content: Text(itx(context, 'source_delete_error'))),
       );
     }
   }
@@ -138,7 +118,7 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Research sources')),
+      appBar: AppBar(title: Text(tr(context, 'research_sources'))),
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -152,6 +132,7 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
                 separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final source = _sources[index];
+                  final type = localizedSourceType(context, source.sourceType);
                   return Card(
                     child: ListTile(
                       onTap: () => _openEditor(source),
@@ -164,14 +145,12 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       subtitle: Text(
-                        source.url.isEmpty
-                            ? source.sourceType.label
-                            : '${source.sourceType.label} · ${source.url}',
+                        source.url.isEmpty ? type : '$type · ${source.url}',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       trailing: PopupMenuButton<_SourceAction>(
-                        tooltip: 'Source actions',
+                        tooltip: itx(context, 'source_actions'),
                         onSelected: (action) {
                           switch (action) {
                             case _SourceAction.edit:
@@ -180,14 +159,14 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
                               _deleteSource(source);
                           }
                         },
-                        itemBuilder: (_) => const [
+                        itemBuilder: (_) => [
                           PopupMenuItem(
                             value: _SourceAction.edit,
-                            child: Text('Edit'),
+                            child: Text(itx(context, 'edit')),
                           ),
                           PopupMenuItem(
                             value: _SourceAction.delete,
-                            child: Text('Delete'),
+                            child: Text(itx(context, 'delete')),
                           ),
                         ],
                       ),
@@ -199,21 +178,19 @@ class _IdeaSourcesScreenState extends State<IdeaSourcesScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openEditor,
         icon: const Icon(Icons.add_link),
-        label: const Text('New source'),
+        label: Text(itx(context, 'new_source')),
       ),
     );
   }
 
-  static IconData _sourceIcon(IdeaSourceType type) {
-    return switch (type) {
-      IdeaSourceType.website => Icons.language,
-      IdeaSourceType.article => Icons.article_outlined,
-      IdeaSourceType.report => Icons.description_outlined,
-      IdeaSourceType.statistics => Icons.query_stats,
-      IdeaSourceType.interview => Icons.record_voice_over_outlined,
-      IdeaSourceType.other => Icons.link,
-    };
-  }
+  static IconData _sourceIcon(IdeaSourceType type) => switch (type) {
+    IdeaSourceType.website => Icons.language,
+    IdeaSourceType.article => Icons.article_outlined,
+    IdeaSourceType.report => Icons.description_outlined,
+    IdeaSourceType.statistics => Icons.query_stats,
+    IdeaSourceType.interview => Icons.record_voice_over_outlined,
+    IdeaSourceType.other => Icons.link,
+  };
 }
 
 class _SourceEditorScreen extends StatefulWidget {
@@ -267,9 +244,7 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
 
   void _save() {
     FocusManager.instance.primaryFocus?.unfocus();
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     final original = widget.source;
     final now = DateTime.now();
@@ -289,15 +264,13 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
 
   String? _validateUrl(String? value) {
     final url = value?.trim() ?? '';
-    if (url.isEmpty) {
-      return null;
-    }
+    if (url.isEmpty) return null;
     final uri = Uri.tryParse(url);
     if (uri == null ||
         !uri.hasScheme ||
         (uri.scheme != 'http' && uri.scheme != 'https') ||
         uri.host.isEmpty) {
-      return 'Enter a complete URL starting with http:// or https://';
+      return itx(context, 'invalid_url');
     }
     return null;
   }
@@ -306,7 +279,9 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
   Widget build(BuildContext context) {
     final isEditing = widget.source != null;
     return Scaffold(
-      appBar: AppBar(title: Text(isEditing ? 'Edit source' : 'Add source')),
+      appBar: AppBar(
+        title: Text(itx(context, isEditing ? 'edit_source' : 'add_source')),
+      ),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -322,17 +297,14 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
                   controller: _titleController,
                   textCapitalization: TextCapitalization.sentences,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Title',
-                    hintText: 'Example: Moldova agriculture report',
-                    prefixIcon: Icon(Icons.title),
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'title'),
+                    hintText: itx(context, 'source_title_hint'),
+                    prefixIcon: const Icon(Icons.title),
                   ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Title is required';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? '${itx(context, 'title')} ${itx(context, 'required')}'
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -341,10 +313,10 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
                   keyboardType: TextInputType.url,
                   textInputAction: TextInputAction.next,
                   autocorrect: false,
-                  decoration: const InputDecoration(
-                    labelText: 'URL (optional)',
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'url_optional'),
                     hintText: 'https://example.com',
-                    prefixIcon: Icon(Icons.link),
+                    prefixIcon: const Icon(Icons.link),
                   ),
                   validator: _validateUrl,
                 ),
@@ -352,15 +324,15 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
                 DropdownButtonFormField<IdeaSourceType>(
                   key: const Key('source_type_field'),
                   initialValue: _sourceType,
-                  decoration: const InputDecoration(
-                    labelText: 'Source type',
-                    prefixIcon: Icon(Icons.category_outlined),
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'source_type'),
+                    prefixIcon: const Icon(Icons.category_outlined),
                   ),
                   items: IdeaSourceType.values
                       .map(
                         (type) => DropdownMenuItem(
                           value: type,
-                          child: Text(type.label),
+                          child: Text(localizedSourceType(context, type)),
                         ),
                       )
                       .toList(),
@@ -375,7 +347,7 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
                   onTap: _selectDate,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   leading: const Icon(Icons.event_outlined),
-                  title: const Text('Access date'),
+                  title: Text(itx(context, 'access_date')),
                   subtitle: Text(_formatDate(_accessedAt)),
                   trailing: const Icon(Icons.edit_calendar_outlined),
                   shape: RoundedRectangleBorder(
@@ -392,9 +364,9 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
                   minLines: 3,
                   maxLines: 7,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Research note (optional)',
-                    hintText: 'What does this source confirm or contradict?',
+                  decoration: InputDecoration(
+                    labelText: itx(context, 'research_note_optional'),
+                    hintText: itx(context, 'source_note_hint'),
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -409,17 +381,14 @@ class _SourceEditorScreenState extends State<_SourceEditorScreen> {
           key: const Key('save_source_button'),
           onPressed: _save,
           icon: const Icon(Icons.save_outlined),
-          label: Text(isEditing ? 'Save changes' : 'Save source'),
+          label: Text(itx(context, isEditing ? 'save_changes' : 'save_source')),
         ),
       ),
     );
   }
 
-  static String _formatDate(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    return '$day.$month.${date.year}';
-  }
+  static String _formatDate(DateTime date) =>
+      '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
 }
 
 enum _SourceAction { edit, delete }
@@ -442,14 +411,14 @@ class _EmptySources extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No research sources yet',
+              itx(context, 'no_research_sources'),
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Add links, reports, interviews, and statistics that support the idea.',
+            Text(
+              itx(context, 'no_research_sources_desc'),
               textAlign: TextAlign.center,
             ),
           ],
@@ -476,7 +445,7 @@ class _SourcesError extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh),
-            label: const Text('Try again'),
+            label: Text(itx(context, 'try_again')),
           ),
         ],
       ),
