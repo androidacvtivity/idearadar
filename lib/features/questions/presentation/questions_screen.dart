@@ -111,7 +111,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                           OutlinedButton.icon(
                             onPressed: _load,
                             icon: const Icon(Icons.refresh),
-                            label: const Text('Retry'),
+                            label: Text(qtx(context, 'try_again')),
                           ),
                         ],
                       ),
