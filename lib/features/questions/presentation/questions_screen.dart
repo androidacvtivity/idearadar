@@ -157,6 +157,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                   ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'questions_add_question',
         key: const Key('new_question_button'),
         onPressed: _addQuestion,
         icon: const Icon(Icons.add),
@@ -191,9 +192,7 @@ class _QuestionCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-          localizedQuestionStatus(context, question.status) +
-              ' · ' +
-              _formatDate(question.updatedAt),
+          '${localizedQuestionStatus(context, question.status)} · ${_formatDate(question.updatedAt)}',
         ),
         trailing: const Icon(Icons.chevron_right),
       ),
@@ -201,11 +200,7 @@ class _QuestionCard extends StatelessWidget {
   }
 
   static String _formatDate(DateTime date) =>
-      date.day.toString().padLeft(2, '0') +
-      '.' +
-      date.month.toString().padLeft(2, '0') +
-      '.' +
-      date.year.toString();
+      '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
 }
 
 class _QuestionSummaryCard extends StatelessWidget {
