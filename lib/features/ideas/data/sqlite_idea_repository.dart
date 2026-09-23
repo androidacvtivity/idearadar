@@ -6,6 +6,8 @@ import 'package:idearadar/features/ideas/domain/idea_evaluation.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 import 'package:idearadar/features/ideas/domain/idea_source.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
+import 'package:idearadar/features/questions/domain/question.dart';
+import 'package:idearadar/features/questions/domain/question_idea_link.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SqliteIdeaRepository implements IdeaRepository {
@@ -204,6 +206,145 @@ class SqliteIdeaRepository implements IdeaRepository {
     if (deletedRows != 1) {
       throw StateError('Assumption not found: $assumptionId');
     }
+  }
+
+
+  @override
+  Future<List<Question>> getQuestions() async {
+    final database = await _ideaDatabase.database;
+    final records = await database.query(
+      IdeaDatabase.questionsTable,
+      orderBy: 'updated_at DESC',
+    );
+    return records.map(_questionFromMap).toList(growable: false);
+  }
+
+  @override
+  Future<void> addQuestion(Question question) async {
+    final database = await _ideaDatabase.database;
+    await database.insert(IdeaDatabase.questionsTable, _questionToMap(question));
+  }
+
+  @override
+  Future<void> updateQuestion(Question question) async {
+    final database = await _ideaDatabase.database;
+    final updatedRows = await database.update(
+      IdeaDatabase.questionsTable,
+      _questionToMap(question),
+      where: 'id = ?',
+      whereArgs: [question.id],
+    );
+    if (updatedRows != 1) {
+      throw StateError('Question not found: ${question.id}');
+    }
+  }
+
+  @override
+  Future<void> deleteQuestion(String questionId) async {
+    final database = await _ideaDatabase.database;
+    final deletedRows = await database.delete(
+      IdeaDatabase.questionsTable,
+      where: 'id = ?',
+      whereArgs: [questionId],
+    );
+    if (deletedRows != 1) {
+      throw StateError('Question not found: $questionId');
+    }
+  }
+
+  @override
+  Future<List<QuestionIdeaLink>> getQuestionIdeaLinks({
+    String? questionId,
+    String? ideaId,
+  }) async {
+    final database = await _ideaDatabase.database;
+    final where = <String>[];
+    final args = <Object?>[];
+    if (questionId != null) {
+      where.add('question_id = ?');
+      args.add(questionId);
+    }
+    if (ideaId != null) {
+      where.add('idea_id = ?');
+      args.add(ideaId);
+    }
+    final records = await database.query(
+      IdeaDatabase.questionIdeaLinksTable,
+      where: where.isEmpty ? null : where.join(' AND '),
+      whereArgs: args.isEmpty ? null : args,
+      orderBy: 'created_at DESC',
+    );
+    return records.map(_questionIdeaLinkFromMap).toList(growable: false);
+  }
+
+  @override
+  Future<void> addQuestionIdeaLink(QuestionIdeaLink link) async {
+    final database = await _ideaDatabase.database;
+    await database.insert(
+      IdeaDatabase.questionIdeaLinksTable,
+      _questionIdeaLinkToMap(link),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  @override
+  Future<void> deleteQuestionIdeaLink(String questionId, String ideaId) async {
+    final database = await _ideaDatabase.database;
+    await database.delete(
+      IdeaDatabase.questionIdeaLinksTable,
+      where: 'question_id = ? AND idea_id = ?',
+      whereArgs: [questionId, ideaId],
+    );
+  }
+
+  Map<String, Object?> _questionToMap(Question question) {
+    return {
+      'id': question.id,
+      'title': question.title,
+      'details': question.details,
+      'answer': question.answer,
+      'status': question.status.name,
+      'created_at': question.createdAt.toIso8601String(),
+      'updated_at': question.updatedAt.toIso8601String(),
+      'answered_at': question.answeredAt?.toIso8601String(),
+    };
+  }
+
+  Question _questionFromMap(Map<String, Object?> map) {
+    return Question(
+      id: map['id']! as String,
+      title: map['title']! as String,
+      details: map['details']! as String,
+      answer: map['answer']! as String,
+      status: QuestionStatus.values.firstWhere(
+        (status) => status.name == map['status'],
+        orElse: () => QuestionStatus.open,
+      ),
+      createdAt: DateTime.parse(map['created_at']! as String),
+      updatedAt: DateTime.parse(map['updated_at']! as String),
+      answeredAt: _optionalDate(map['answered_at']),
+    );
+  }
+
+  Map<String, Object?> _questionIdeaLinkToMap(QuestionIdeaLink link) {
+    return {
+      'question_id': link.questionId,
+      'idea_id': link.ideaId,
+      'relation_type': link.relationType.name,
+      'created_at': link.createdAt.toIso8601String(),
+    };
+  }
+
+  QuestionIdeaLink _questionIdeaLinkFromMap(Map<String, Object?> map) {
+    return QuestionIdeaLink(
+      questionId: map['question_id']! as String,
+      ideaId: map['idea_id']! as String,
+      relationType: QuestionIdeaRelationType.values.firstWhere(
+        (type) => type.name == map['relation_type'],
+        orElse: () => QuestionIdeaRelationType.related,
+      ),
+      createdAt: DateTime.parse(map['created_at']! as String),
+    );
   }
 
   Map<String, Object?> _assumptionToMap(IdeaAssumption assumption) {
