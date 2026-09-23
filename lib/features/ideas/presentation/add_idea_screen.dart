@@ -5,9 +5,16 @@ import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
 
 class AddIdeaScreen extends StatefulWidget {
-  const AddIdeaScreen({this.idea, super.key});
+  const AddIdeaScreen({
+    this.idea,
+    this.initialTitle,
+    this.initialSummary,
+    super.key,
+  });
 
   final Idea? idea;
+  final String? initialTitle;
+  final String? initialSummary;
 
   @override
   State<AddIdeaScreen> createState() => _AddIdeaScreenState();
@@ -30,7 +37,11 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
   void initState() {
     super.initState();
     final idea = widget.idea;
-    if (idea == null) return;
+    if (idea == null) {
+      _titleController.text = widget.initialTitle ?? '';
+      _summaryController.text = widget.initialSummary ?? '';
+      return;
+    }
     _titleController.text = idea.title;
     _summaryController.text = idea.summary;
     _problemController.text = idea.problem;
