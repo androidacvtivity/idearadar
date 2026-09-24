@@ -136,6 +136,13 @@ void main() {
     await tester.pumpWidget(IdeaRadarApp(repository: repository));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('Updated mobile client portal'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
     expect(find.text('24/40'), findsOneWidget);
   });
 
