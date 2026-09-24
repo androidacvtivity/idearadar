@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idearadar/app/localization/app_localization.dart';
+import 'package:idearadar/app/localization/question_localization.dart';
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
 import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
@@ -9,6 +10,7 @@ import 'package:idearadar/features/ideas/presentation/idea_details_result.dart';
 import 'package:idearadar/features/ideas/presentation/idea_evaluation_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_notes_screen.dart';
 import 'package:idearadar/features/ideas/presentation/idea_sources_screen.dart';
+import 'package:idearadar/features/questions/presentation/idea_questions_screen.dart';
 
 class IdeaDetailsScreen extends StatelessWidget {
   const IdeaDetailsScreen({
@@ -294,6 +296,28 @@ class IdeaDetailsScreen extends StatelessWidget {
                 ),
                 title: Text(tr(context, 'assumption_radar')),
                 subtitle: Text(tr(context, 'assumption_radar_subtitle')),
+                trailing: const Icon(Icons.chevron_right),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                key: const Key('idea_questions_tile'),
+                onTap: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (_) => IdeaQuestionsScreen(
+                      idea: idea,
+                      repository: repository,
+                    ),
+                  ),
+                ),
+                leading: CircleAvatar(
+                  backgroundColor: cs.secondaryContainer,
+                  foregroundColor: cs.onSecondaryContainer,
+                  child: const Icon(Icons.help_outline),
+                ),
+                title: Text(qtx(context, 'related_questions')),
+                subtitle: Text(qtx(context, 'related_questions_subtitle')),
                 trailing: const Icon(Icons.chevron_right),
               ),
             ),

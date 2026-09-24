@@ -365,6 +365,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'dashboard_add_idea',
         onPressed: _addIdea,
         icon: const Icon(Icons.add),
         label: Text(tr(context, 'new_idea')),

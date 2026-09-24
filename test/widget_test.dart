@@ -58,6 +58,13 @@ void main() {
     await tester.tap(find.byKey(const Key('save_idea_button')));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('Mobile client portal'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
     expect(find.text('Mobile client portal'), findsOneWidget);
     expect(find.text('Business services · New'), findsOneWidget);
     expect(find.text('Your idea radar is ready'), findsNothing);
@@ -70,6 +77,12 @@ void main() {
     await tester.pumpWidget(IdeaRadarApp(repository: repository));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('Mobile client portal'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Mobile client portal'), findsOneWidget);
 
     await tester.tap(find.text('Mobile client portal'));
@@ -98,6 +111,12 @@ void main() {
     await tester.pumpWidget(IdeaRadarApp(repository: repository));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('Updated mobile client portal'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Updated mobile client portal'), findsOneWidget);
 
     await tester.tap(find.text('Updated mobile client portal'));
@@ -115,6 +134,13 @@ void main() {
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpWidget(IdeaRadarApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Updated mobile client portal'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('24/40'), findsOneWidget);
@@ -170,6 +196,12 @@ void main() {
     await tester.pumpWidget(IdeaRadarApp(repository: repository));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('Idea to delete'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Idea to delete'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('More actions'));
@@ -293,6 +325,12 @@ void main() {
     await tester.pumpWidget(IdeaRadarApp(repository: repository));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('Idea requiring review'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Idea requiring review'));
     await tester.pumpAndSettle();
     final nextReviewTile = find.byKey(const Key('next_review_tile'));
@@ -351,6 +389,12 @@ void main() {
     await tester.pumpWidget(IdeaRadarApp(repository: repository));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('Idea to archive'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Idea to archive'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('More actions'));
@@ -386,6 +430,36 @@ void main() {
     await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('Idea to archive'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Idea to archive'), findsOneWidget);
+  });
+
+  testWidgets('creates and displays a standalone question', (tester) async {
+    final repository = await pumpIdeaRadar(tester);
+
+    await tester.tap(find.text('Questions'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Questions'), findsWidgets);
+    expect(find.text('No questions yet'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('new_question_button')));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('question_title_field')),
+      'What problem appears most often?',
+    );
+    await tester.tap(find.byKey(const Key('save_question_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('What problem appears most often?'), findsOneWidget);
+    expect((await repository.getQuestions()).single.title,
+        'What problem appears most often?');
   });
 }

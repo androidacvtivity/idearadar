@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:idearadar/app/localization/app_localization.dart';
 import 'package:idearadar/app/theme/app_theme.dart';
-import 'package:idearadar/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:idearadar/app/main_screen.dart';
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
 
 class IdeaRadarApp extends StatelessWidget {
@@ -28,7 +28,7 @@ class IdeaRadarApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: DashboardScreen(repository: repository),
+          home: MainScreen(repository: repository),
         );
       },
     );

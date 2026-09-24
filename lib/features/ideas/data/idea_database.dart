@@ -3,11 +3,13 @@ import 'package:sqflite/sqflite.dart';
 
 class IdeaDatabase {
   static const databaseName = 'idearadar.db';
-  static const databaseVersion = 4;
+  static const databaseVersion = 5;
   static const ideasTable = 'ideas';
   static const notesTable = 'idea_notes';
   static const sourcesTable = 'idea_sources';
   static const assumptionsTable = 'idea_assumptions';
+  static const questionsTable = 'questions';
+  static const questionIdeaLinksTable = 'question_idea_links';
 
   Database? _database;
 
@@ -30,6 +32,8 @@ class IdeaDatabase {
         await _createNotesTable(database);
         await _createSourcesTable(database);
         await _createAssumptionsTable(database);
+        await _createQuestionsTable(database);
+        await _createQuestionIdeaLinksTable(database);
       },
       onUpgrade: (database, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -40,6 +44,10 @@ class IdeaDatabase {
         }
         if (oldVersion < 4) {
           await _createAssumptionsTable(database);
+        }
+        if (oldVersion < 5) {
+          await _createQuestionsTable(database);
+          await _createQuestionIdeaLinksTable(database);
         }
       },
     );
@@ -114,6 +122,35 @@ class IdeaDatabase {
         evidence_count INTEGER NOT NULL DEFAULT 0,
         next_experiment TEXT,
         is_critical INTEGER NOT NULL DEFAULT 1,
+        FOREIGN KEY (idea_id) REFERENCES $ideasTable (id) ON DELETE CASCADE
+      )
+    ''');
+  }
+
+  static Future<void> _createQuestionsTable(Database database) {
+    return database.execute('''
+      CREATE TABLE $questionsTable (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        details TEXT NOT NULL DEFAULT '',
+        answer TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        answered_at TEXT
+      )
+    ''');
+  }
+
+  static Future<void> _createQuestionIdeaLinksTable(Database database) {
+    return database.execute('''
+      CREATE TABLE $questionIdeaLinksTable (
+        question_id TEXT NOT NULL,
+        idea_id TEXT NOT NULL,
+        relation_type TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (question_id, idea_id),
+        FOREIGN KEY (question_id) REFERENCES $questionsTable (id) ON DELETE CASCADE,
         FOREIGN KEY (idea_id) REFERENCES $ideasTable (id) ON DELETE CASCADE
       )
     ''');

@@ -2,6 +2,8 @@ import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_assumption.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 import 'package:idearadar/features/ideas/domain/idea_source.dart';
+import 'package:idearadar/features/questions/domain/question.dart';
+import 'package:idearadar/features/questions/domain/question_idea_link.dart';
 
 abstract interface class IdeaRepository {
   Future<void> initialize();
@@ -37,4 +39,18 @@ abstract interface class IdeaRepository {
   Future<void> updateAssumption(IdeaAssumption assumption);
 
   Future<void> deleteAssumption(String assumptionId);
+
+  Future<List<Question>> getQuestions();
+
+  Future<void> addQuestion(Question question);
+
+  Future<void> updateQuestion(Question question);
+
+  Future<void> deleteQuestion(String questionId);
+
+  Future<List<QuestionIdeaLink>> getQuestionIdeaLinks({String? questionId, String? ideaId});
+
+  Future<void> addQuestionIdeaLink(QuestionIdeaLink link);
+
+  Future<void> deleteQuestionIdeaLink(String questionId, String ideaId);
 }
