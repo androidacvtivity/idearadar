@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:idearadar/app/localization/question_localization.dart';
+import 'package:idearadar/app/localization/problem_localization.dart';
 import 'package:idearadar/features/ideas/data/idea_repository.dart';
-import 'package:idearadar/features/questions/domain/question.dart';
-import 'package:idearadar/features/questions/presentation/question_details_screen.dart';
-import 'package:idearadar/features/questions/presentation/question_editor_screen.dart';
+import 'package:idearadar/features/problems/domain/problem.dart';
+import 'package:idearadar/features/problems/presentation/problem_details_screen.dart';
+import 'package:idearadar/features/problems/presentation/problem_editor_screen.dart';
 
-class QuestionsScreen extends StatefulWidget {
-  const QuestionsScreen({required this.repository, super.key});
+class ProblemsScreen extends StatefulWidget {
+  const ProblemsScreen({required this.repository, super.key});
 
   final IdeaRepository repository;
 
   @override
-  State<QuestionsScreen> createState() => _QuestionsScreenState();
+  State<ProblemsScreen> createState() => _ProblemsScreenState();
 }
 
-class _QuestionsScreenState extends State<QuestionsScreen> {
-  final List<Question> _questions = [];
+class _ProblemsScreenState extends State<ProblemsScreen> {
+  final List<Problem> _problems = [];
   bool _isLoading = true;
   String? _error;
 
@@ -28,12 +28,12 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
   Future<void> _load() async {
     try {
       await widget.repository.initialize();
-      final questions = await widget.repository.getQuestions();
+      final problems = await widget.repository.getProblems();
       if (!mounted) return;
       setState(() {
-        _questions
+        _problems
           ..clear()
-          ..addAll(questions);
+          ..addAll(problems);
         _isLoading = false;
         _error = null;
       });
@@ -41,34 +41,34 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error = qtx(context, 'questions_load_error');
+        _error = ptx(context, 'problems_load_error');
       });
     }
   }
 
-  Future<void> _addQuestion() async {
-    final question = await Navigator.of(context).push<Question>(
-      MaterialPageRoute(builder: (_) => const QuestionEditorScreen()),
+  Future<void> _addProblem() async {
+    final problem = await Navigator.of(context).push<Problem>(
+      MaterialPageRoute(builder: (_) => const ProblemEditorScreen()),
     );
-    if (!mounted || question == null) return;
+    if (!mounted || problem == null) return;
 
     try {
-      await widget.repository.addQuestion(question);
+      await widget.repository.addProblem(problem);
       if (!mounted) return;
-      setState(() => _questions.insert(0, question));
+      setState(() => _problems.insert(0, problem));
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(qtx(context, 'question_save_error'))),
+        SnackBar(content: Text(ptx(context, 'problem_save_error'))),
       );
     }
   }
 
-  Future<void> _openQuestion(Question question) async {
+  Future<void> _openProblem(Problem problem) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
-        builder: (_) => QuestionDetailsScreen(
-          question: question,
+        builder: (_) => ProblemDetailsScreen(
+          problem: problem,
           repository: widget.repository,
         ),
       ),
@@ -78,12 +78,16 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final openCount = _questions
-        .where((question) => question.status == QuestionStatus.open)
+    final activeCount = _problems
+        .where(
+          (problem) =>
+              problem.status != ProblemStatus.parked &&
+              problem.status != ProblemStatus.rejected,
+        )
         .length;
     final today = DateTime.now();
-    final todayCount = _questions.where((question) {
-      final created = question.createdAt;
+    final todayCount = _problems.where((problem) {
+      final created = problem.createdAt;
       return created.year == today.year &&
           created.month == today.month &&
           created.day == today.day;
@@ -92,7 +96,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          qtx(context, 'questions'),
+          ptx(context, 'problems'),
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
@@ -111,7 +115,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                       OutlinedButton.icon(
                         onPressed: _load,
                         icon: const Icon(Icons.refresh),
-                        label: Text(qtx(context, 'try_again')),
+                        label: const Text('Retry'),
                       ),
                     ],
                   ),
@@ -121,56 +125,56 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 104),
                 children: [
                   Text(
-                    qtx(context, 'questions_subtitle'),
+                    ptx(context, 'problems_subtitle'),
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 20),
                   Row(
                     children: [
                       Expanded(
-                        child: _QuestionSummaryCard(
-                          label: qtx(context, 'today'),
+                        child: _ProblemSummaryCard(
+                          label: ptx(context, 'today'),
                           value: '$todayCount',
                           icon: Icons.today_outlined,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _QuestionSummaryCard(
-                          label: qtx(context, 'open_questions'),
-                          value: '$openCount',
-                          icon: Icons.help_outline,
+                        child: _ProblemSummaryCard(
+                          label: ptx(context, 'active_problems'),
+                          value: '$activeCount',
+                          icon: Icons.report_problem_outlined,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  if (_questions.isEmpty)
-                    _EmptyQuestions(onAdd: _addQuestion)
+                  if (_problems.isEmpty)
+                    _EmptyProblems(onAdd: _addProblem)
                   else
-                    for (final question in _questions)
-                      _QuestionCard(
-                        question: question,
-                        onTap: () => _openQuestion(question),
+                    for (final problem in _problems)
+                      _ProblemCard(
+                        problem: problem,
+                        onTap: () => _openProblem(problem),
                       ),
                 ],
               ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'questions_add_question',
-        key: const Key('new_question_button'),
-        onPressed: _addQuestion,
+        heroTag: 'problems_add_problem',
+        key: const Key('new_problem_button'),
+        onPressed: _addProblem,
         icon: const Icon(Icons.add),
-        label: Text(qtx(context, 'new_question')),
+        label: Text(ptx(context, 'new_problem')),
       ),
     );
   }
 }
 
-class _QuestionCard extends StatelessWidget {
-  const _QuestionCard({required this.question, required this.onTap});
+class _ProblemCard extends StatelessWidget {
+  const _ProblemCard({required this.problem, required this.onTap});
 
-  final Question question;
+  final Problem problem;
   final VoidCallback onTap;
 
   @override
@@ -182,17 +186,17 @@ class _QuestionCard extends StatelessWidget {
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         leading: CircleAvatar(
-          backgroundColor: cs.secondaryContainer,
-          foregroundColor: cs.onSecondaryContainer,
-          child: const Icon(Icons.help_outline),
+          backgroundColor: cs.errorContainer,
+          foregroundColor: cs.onErrorContainer,
+          child: const Icon(Icons.report_problem_outlined),
         ),
         title: Text(
-          question.title,
+          problem.title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-          '${localizedQuestionStatus(context, question.status)} · ${_formatDate(question.updatedAt)}',
+          '${localizedProblemStatus(context, problem.status)} · ${_formatDate(problem.updatedAt)}',
         ),
         trailing: const Icon(Icons.chevron_right),
       ),
@@ -203,8 +207,8 @@ class _QuestionCard extends StatelessWidget {
       '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
 }
 
-class _QuestionSummaryCard extends StatelessWidget {
-  const _QuestionSummaryCard({
+class _ProblemSummaryCard extends StatelessWidget {
+  const _ProblemSummaryCard({
     required this.label,
     required this.value,
     required this.icon,
@@ -216,14 +220,13 @@ class _QuestionSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: cs.primary),
+            Icon(icon, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 10),
             Text(
               value,
@@ -239,8 +242,8 @@ class _QuestionSummaryCard extends StatelessWidget {
   }
 }
 
-class _EmptyQuestions extends StatelessWidget {
-  const _EmptyQuestions({required this.onAdd});
+class _EmptyProblems extends StatelessWidget {
+  const _EmptyProblems({required this.onAdd});
 
   final VoidCallback onAdd;
 
@@ -252,27 +255,24 @@ class _EmptyQuestions extends StatelessWidget {
         child: Column(
           children: [
             Icon(
-              Icons.help_outline,
+              Icons.report_problem_outlined,
               size: 48,
               color: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(height: 16),
             Text(
-              qtx(context, 'no_questions'),
+              ptx(context, 'no_problems'),
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
-            Text(
-              qtx(context, 'no_questions_desc'),
-              textAlign: TextAlign.center,
-            ),
+            Text(ptx(context, 'no_problems_desc'), textAlign: TextAlign.center),
             const SizedBox(height: 18),
             FilledButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add),
-              label: Text(qtx(context, 'new_question')),
+              label: Text(ptx(context, 'new_problem')),
             ),
           ],
         ),

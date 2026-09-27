@@ -162,7 +162,10 @@ class _QuestionDetailsScreenState extends State<QuestionDetailsScreen> {
   }
 
   Future<void> _unlink(QuestionIdeaLink link) async {
-    await widget.repository.deleteQuestionIdeaLink(link.questionId, link.ideaId);
+    await widget.repository.deleteQuestionIdeaLink(
+      link.questionId,
+      link.ideaId,
+    );
     if (mounted) await _loadLinks();
   }
 
@@ -220,9 +223,9 @@ class _QuestionDetailsScreenState extends State<QuestionDetailsScreen> {
                   Text(
                     _question.title,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: cs.onSecondaryContainer,
-                        ),
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSecondaryContainer,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Chip(
@@ -263,10 +266,9 @@ class _QuestionDetailsScreenState extends State<QuestionDetailsScreen> {
               children: [
                 Text(
                   qtx(context, 'linked_ideas'),
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const Spacer(),
                 TextButton.icon(
@@ -332,10 +334,9 @@ class _QuestionSection extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(text),

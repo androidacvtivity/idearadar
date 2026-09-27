@@ -1,8 +1,4 @@
-enum QuestionStatus {
-  open,
-  answered,
-  parked,
-}
+enum QuestionStatus { open, answered, parked }
 
 class Question {
   const Question({

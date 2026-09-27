@@ -74,8 +74,9 @@ class _IdeaQuestionsScreenState extends State<IdeaQuestionsScreen> {
   Future<void> _linkExisting() async {
     final allQuestions = await widget.repository.getQuestions();
     final linkedIds = _links.map((link) => link.questionId).toSet();
-    final available =
-        allQuestions.where((question) => !linkedIds.contains(question.id)).toList();
+    final available = allQuestions
+        .where((question) => !linkedIds.contains(question.id))
+        .toList();
     if (!mounted || available.isEmpty) return;
 
     final selected = await showDialog<Question>(
@@ -131,10 +132,9 @@ class _IdeaQuestionsScreenState extends State<IdeaQuestionsScreen> {
                 children: [
                   Text(
                     widget.idea.title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(qtx(context, 'related_questions_subtitle')),

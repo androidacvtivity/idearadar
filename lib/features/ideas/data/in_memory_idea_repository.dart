@@ -3,6 +3,9 @@ import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_assumption.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 import 'package:idearadar/features/ideas/domain/idea_source.dart';
+import 'package:idearadar/features/problems/domain/problem.dart';
+import 'package:idearadar/features/problems/domain/problem_idea_link.dart';
+import 'package:idearadar/features/problems/domain/problem_question_link.dart';
 import 'package:idearadar/features/questions/domain/question.dart';
 import 'package:idearadar/features/questions/domain/question_idea_link.dart';
 
@@ -14,12 +17,20 @@ class InMemoryIdeaRepository implements IdeaRepository {
     List<IdeaAssumption> seedAssumptions = const [],
     List<Question> seedQuestions = const [],
     List<QuestionIdeaLink> seedQuestionIdeaLinks = const [],
+    List<Problem> seedProblems = const [],
+    List<ProblemIdeaLink> seedProblemIdeaLinks = const [],
+    List<ProblemQuestionLink> seedProblemQuestionLinks = const [],
   }) : _ideas = List<Idea>.from(seedIdeas),
        _notes = List<IdeaNote>.from(seedNotes),
        _sources = List<IdeaSource>.from(seedSources),
        _assumptions = List<IdeaAssumption>.from(seedAssumptions),
        _questions = List<Question>.from(seedQuestions),
-       _questionIdeaLinks = List<QuestionIdeaLink>.from(seedQuestionIdeaLinks);
+       _questionIdeaLinks = List<QuestionIdeaLink>.from(seedQuestionIdeaLinks),
+       _problems = List<Problem>.from(seedProblems),
+       _problemIdeaLinks = List<ProblemIdeaLink>.from(seedProblemIdeaLinks),
+       _problemQuestionLinks = List<ProblemQuestionLink>.from(
+         seedProblemQuestionLinks,
+       );
 
   final List<Idea> _ideas;
   final List<IdeaNote> _notes;
@@ -27,6 +38,9 @@ class InMemoryIdeaRepository implements IdeaRepository {
   final List<IdeaAssumption> _assumptions;
   final List<Question> _questions;
   final List<QuestionIdeaLink> _questionIdeaLinks;
+  final List<Problem> _problems;
+  final List<ProblemIdeaLink> _problemIdeaLinks;
+  final List<ProblemQuestionLink> _problemQuestionLinks;
 
   @override
   Future<void> initialize() async {}
@@ -63,6 +77,7 @@ class InMemoryIdeaRepository implements IdeaRepository {
     _sources.removeWhere((source) => source.ideaId == ideaId);
     _assumptions.removeWhere((assumption) => assumption.ideaId == ideaId);
     _questionIdeaLinks.removeWhere((link) => link.ideaId == ideaId);
+    _problemIdeaLinks.removeWhere((link) => link.ideaId == ideaId);
   }
 
   @override
@@ -196,6 +211,7 @@ class InMemoryIdeaRepository implements IdeaRepository {
     if (removed != 1) throw StateError('Question not found: $questionId');
     _questions.removeWhere((q) => q.id == questionId);
     _questionIdeaLinks.removeWhere((link) => link.questionId == questionId);
+    _problemQuestionLinks.removeWhere((link) => link.questionId == questionId);
   }
 
   @override
@@ -220,7 +236,9 @@ class InMemoryIdeaRepository implements IdeaRepository {
       throw StateError('Idea not found: ${link.ideaId}');
     }
     _questionIdeaLinks.removeWhere(
-      (current) => current.questionId == link.questionId && current.ideaId == link.ideaId,
+      (current) =>
+          current.questionId == link.questionId &&
+          current.ideaId == link.ideaId,
     );
     _questionIdeaLinks.add(link);
   }
@@ -229,6 +247,108 @@ class InMemoryIdeaRepository implements IdeaRepository {
   Future<void> deleteQuestionIdeaLink(String questionId, String ideaId) async {
     _questionIdeaLinks.removeWhere(
       (link) => link.questionId == questionId && link.ideaId == ideaId,
+    );
+  }
+
+  @override
+  Future<List<Problem>> getProblems() async {
+    final problems = List<Problem>.from(_problems)
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return List<Problem>.unmodifiable(problems);
+  }
+
+  @override
+  Future<void> addProblem(Problem problem) async {
+    _problems.insert(0, problem);
+  }
+
+  @override
+  Future<void> updateProblem(Problem problem) async {
+    final index = _problems.indexWhere((current) => current.id == problem.id);
+    if (index == -1) throw StateError('Problem not found: ${problem.id}');
+    _problems[index] = problem;
+  }
+
+  @override
+  Future<void> deleteProblem(String problemId) async {
+    final removed = _problems.where((p) => p.id == problemId).length;
+    if (removed != 1) throw StateError('Problem not found: $problemId');
+    _problems.removeWhere((p) => p.id == problemId);
+    _problemIdeaLinks.removeWhere((link) => link.problemId == problemId);
+    _problemQuestionLinks.removeWhere((link) => link.problemId == problemId);
+  }
+
+  @override
+  Future<List<ProblemIdeaLink>> getProblemIdeaLinks({
+    String? problemId,
+    String? ideaId,
+  }) async {
+    final links = _problemIdeaLinks.where((link) {
+      if (problemId != null && link.problemId != problemId) return false;
+      if (ideaId != null && link.ideaId != ideaId) return false;
+      return true;
+    }).toList();
+    return List<ProblemIdeaLink>.unmodifiable(links);
+  }
+
+  @override
+  Future<void> addProblemIdeaLink(ProblemIdeaLink link) async {
+    if (!_problems.any((problem) => problem.id == link.problemId)) {
+      throw StateError('Problem not found: ${link.problemId}');
+    }
+    if (!_ideas.any((idea) => idea.id == link.ideaId)) {
+      throw StateError('Idea not found: ${link.ideaId}');
+    }
+    _problemIdeaLinks.removeWhere(
+      (current) =>
+          current.problemId == link.problemId && current.ideaId == link.ideaId,
+    );
+    _problemIdeaLinks.add(link);
+  }
+
+  @override
+  Future<void> deleteProblemIdeaLink(String problemId, String ideaId) async {
+    _problemIdeaLinks.removeWhere(
+      (link) => link.problemId == problemId && link.ideaId == ideaId,
+    );
+  }
+
+  @override
+  Future<List<ProblemQuestionLink>> getProblemQuestionLinks({
+    String? problemId,
+    String? questionId,
+  }) async {
+    final links = _problemQuestionLinks.where((link) {
+      if (problemId != null && link.problemId != problemId) return false;
+      if (questionId != null && link.questionId != questionId) return false;
+      return true;
+    }).toList();
+    return List<ProblemQuestionLink>.unmodifiable(links);
+  }
+
+  @override
+  Future<void> addProblemQuestionLink(ProblemQuestionLink link) async {
+    if (!_problems.any((problem) => problem.id == link.problemId)) {
+      throw StateError('Problem not found: ${link.problemId}');
+    }
+    if (!_questions.any((question) => question.id == link.questionId)) {
+      throw StateError('Question not found: ${link.questionId}');
+    }
+    _problemQuestionLinks.removeWhere(
+      (current) =>
+          current.problemId == link.problemId &&
+          current.questionId == link.questionId,
+    );
+    _problemQuestionLinks.add(link);
+  }
+
+  @override
+  Future<void> deleteProblemQuestionLink(
+    String problemId,
+    String questionId,
+  ) async {
+    _problemQuestionLinks.removeWhere(
+      (link) => link.problemId == problemId && link.questionId == questionId,
     );
   }
 }
