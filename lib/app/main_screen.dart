@@ -17,7 +17,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _index = 0;
+  int _index = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +35,8 @@ class _MainScreenState extends State<MainScreen> {
         onDestinationSelected: (index) => setState(() => _index = index),
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.radar_outlined),
-            selectedIcon: const Icon(Icons.radar),
+            icon: const Icon(Icons.report_problem_outlined),
+            selectedIcon: const Icon(Icons.report_problem),
             label: ptx(context, 'problems'),
           ),
           NavigationDestination(
