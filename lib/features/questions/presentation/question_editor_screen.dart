@@ -3,10 +3,16 @@ import 'package:idearadar/app/localization/question_localization.dart';
 import 'package:idearadar/features/questions/domain/question.dart';
 
 class QuestionEditorScreen extends StatefulWidget {
-  const QuestionEditorScreen({this.question, this.initialTitle, super.key});
+  const QuestionEditorScreen({
+    this.question,
+    this.initialTitle,
+    this.initialDetails,
+    super.key,
+  });
 
   final Question? question;
   final String? initialTitle;
+  final String? initialDetails;
 
   @override
   State<QuestionEditorScreen> createState() => _QuestionEditorScreenState();
@@ -26,7 +32,9 @@ class _QuestionEditorScreenState extends State<QuestionEditorScreen> {
     _titleController = TextEditingController(
       text: question?.title ?? widget.initialTitle ?? '',
     );
-    _detailsController = TextEditingController(text: question?.details ?? '');
+    _detailsController = TextEditingController(
+      text: question?.details ?? widget.initialDetails ?? '',
+    );
     _answerController = TextEditingController(text: question?.answer ?? '');
     _status = question?.status ?? QuestionStatus.open;
   }
