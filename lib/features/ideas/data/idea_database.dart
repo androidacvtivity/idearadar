@@ -254,127 +254,102 @@ class IdeaDatabase {
 
     final batch = database.batch();
 
-    batch.insert(
-      problemsTable,
-      {
-        'id': roProblemId,
-        'title': 'Oamenii ocupați uită sarcini mici, dar importante',
-        'description':
-            'Sarcinile sunt notate în locuri diferite — mesaje, hârtie și aplicații de notițe — iar uneori sunt uitate.',
-        'affected_users':
-            'Persoane ocupate, părinți, angajați și persoane care gestionează multe activități zilnice.',
-        'frequency': 'Frecvent, pe parcursul săptămânii.',
-        'severity':
-            'Poate duce la întârzieri, stres și activități importante ratate.',
-        'current_workaround':
-            'Liste pe hârtie, aplicații de notițe, alarme și mesaje trimise către sine.',
-        'evidence':
-            'Exemplu demonstrativ: observă problema și adaugă dovezi reale înainte de a construi soluția.',
-        'status': 'observed',
-        'created_at': now,
-        'updated_at': now,
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
+    batch.insert(problemsTable, {
+      'id': roProblemId,
+      'title': 'Oamenii ocupați uită sarcini mici, dar importante',
+      'description':
+          'Sarcinile sunt notate în locuri diferite — mesaje, hârtie și aplicații de notițe — iar uneori sunt uitate.',
+      'affected_users':
+          'Persoane ocupate, părinți, angajați și persoane care gestionează multe activități zilnice.',
+      'frequency': 'Frecvent, pe parcursul săptămânii.',
+      'severity':
+          'Poate duce la întârzieri, stres și activități importante ratate.',
+      'current_workaround':
+          'Liste pe hârtie, aplicații de notițe, alarme și mesaje trimise către sine.',
+      'evidence':
+          'Exemplu demonstrativ: observă problema și adaugă dovezi reale înainte de a construi soluția.',
+      'status': 'observed',
+      'created_at': now,
+      'updated_at': now,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
-    batch.insert(
-      questionsTable,
-      {
-        'id': roQuestionId,
-        'title':
-            'Care este cel mai simplu mod de a le reaminti oamenilor sarcinile importante fără să-i deranjeze?',
-        'details':
-            'Caută să înțelegi când, unde și prin ce tip de notificare ar fi util un reminder.',
-        'answer': '',
-        'status': 'open',
-        'created_at': now,
-        'updated_at': now,
-        'answered_at': null,
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
+    batch.insert(questionsTable, {
+      'id': roQuestionId,
+      'title':
+          'Care este cel mai simplu mod de a le reaminti oamenilor sarcinile importante fără să-i deranjeze?',
+      'details':
+          'Caută să înțelegi când, unde și prin ce tip de notificare ar fi util un reminder.',
+      'answer': '',
+      'status': 'open',
+      'created_at': now,
+      'updated_at': now,
+      'answered_at': null,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
-    batch.insert(
-      ideasTable,
-      {
-        'id': roIdeaId,
-        'title': 'Reminder simplu pentru sarcinile importante',
-        'summary':
-            'O aplicație care afișează câteva sarcini importante la momentele potrivite ale zilei.',
-        'problem':
-            'Oamenii ocupați uită sarcini mici, dar importante.',
-        'solution':
-            'Un reminder simplu și discret, concentrat doar pe sarcinile importante.',
-        'domain': 'Productivitate',
-        'target_users': 'Persoane ocupate, părinți și angajați.',
-        'paying_customer': 'Utilizatorul individual.',
-        'status': 'newIdea',
-        'created_at': now,
-        'updated_at': now,
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
+    batch.insert(ideasTable, {
+      'id': roIdeaId,
+      'title': 'Reminder simplu pentru sarcinile importante',
+      'summary':
+          'O aplicație care afișează câteva sarcini importante la momentele potrivite ale zilei.',
+      'problem': 'Oamenii ocupați uită sarcini mici, dar importante.',
+      'solution':
+          'Un reminder simplu și discret, concentrat doar pe sarcinile importante.',
+      'domain': 'Productivitate',
+      'target_users': 'Persoane ocupate, părinți și angajați.',
+      'paying_customer': 'Utilizatorul individual.',
+      'status': 'newIdea',
+      'created_at': now,
+      'updated_at': now,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
-    batch.insert(
-      problemsTable,
-      {
-        'id': enProblemId,
-        'title': 'Useful information gets saved without context',
-        'description':
-            'Interesting articles, products, ideas, and resources are scattered across browsers, messages, screenshots, and notes.',
-        'affected_users':
-            'Students, professionals, researchers, entrepreneurs, and curious internet users.',
-        'frequency': 'Several times a week for active internet users.',
-        'severity':
-            'Useful information is difficult to rediscover and often loses its original meaning.',
-        'current_workaround':
-            'Browser bookmarks, screenshots, note-taking apps, and sending links to yourself.',
-        'evidence':
-            'Demo example: validate the problem with real observations before building a solution.',
-        'status': 'observed',
-        'created_at': now,
-        'updated_at': now,
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
+    batch.insert(problemsTable, {
+      'id': enProblemId,
+      'title': 'Useful information gets saved without context',
+      'description':
+          'Interesting articles, products, ideas, and resources are scattered across browsers, messages, screenshots, and notes.',
+      'affected_users':
+          'Students, professionals, researchers, entrepreneurs, and curious internet users.',
+      'frequency': 'Several times a week for active internet users.',
+      'severity':
+          'Useful information is difficult to rediscover and often loses its original meaning.',
+      'current_workaround':
+          'Browser bookmarks, screenshots, note-taking apps, and sending links to yourself.',
+      'evidence':
+          'Demo example: validate the problem with real observations before building a solution.',
+      'status': 'observed',
+      'created_at': now,
+      'updated_at': now,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
-    batch.insert(
-      questionsTable,
-      {
-        'id': enQuestionId,
-        'title':
-            'How could useful information be captured together with the reason it was saved?',
-        'details':
-            'Explore what minimum context would make a saved resource useful again later.',
-        'answer': '',
-        'status': 'open',
-        'created_at': now,
-        'updated_at': now,
-        'answered_at': null,
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
+    batch.insert(questionsTable, {
+      'id': enQuestionId,
+      'title':
+          'How could useful information be captured together with the reason it was saved?',
+      'details':
+          'Explore what minimum context would make a saved resource useful again later.',
+      'answer': '',
+      'status': 'open',
+      'created_at': now,
+      'updated_at': now,
+      'answered_at': null,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
-    batch.insert(
-      ideasTable,
-      {
-        'id': enIdeaId,
-        'title': 'Save links with a short reason',
-        'summary':
-            'A lightweight app that saves a link together with a short note explaining why it matters.',
-        'problem': 'Useful information gets saved without context.',
-        'solution':
-            'Save each resource together with a short reason, tag, and optional next action.',
-        'domain': 'Knowledge management',
-        'target_users':
-            'Students, professionals, researchers, and entrepreneurs.',
-        'paying_customer': 'The individual user.',
-        'status': 'newIdea',
-        'created_at': now,
-        'updated_at': now,
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
+    batch.insert(ideasTable, {
+      'id': enIdeaId,
+      'title': 'Save links with a short reason',
+      'summary':
+          'A lightweight app that saves a link together with a short note explaining why it matters.',
+      'problem': 'Useful information gets saved without context.',
+      'solution':
+          'Save each resource together with a short reason, tag, and optional next action.',
+      'domain': 'Knowledge management',
+      'target_users':
+          'Students, professionals, researchers, and entrepreneurs.',
+      'paying_customer': 'The individual user.',
+      'status': 'newIdea',
+      'created_at': now,
+      'updated_at': now,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
     for (final values in [
       {
@@ -439,11 +414,10 @@ class IdeaDatabase {
       );
     }
 
-    batch.insert(
-      appMetadataTable,
-      {'key': seedKey, 'value': '1'},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    batch.insert(appMetadataTable, {
+      'key': seedKey,
+      'value': '1',
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
 
     await batch.commit(noResult: true);
   }
