@@ -6,6 +6,9 @@ import 'package:idearadar/features/ideas/domain/idea_evaluation.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 import 'package:idearadar/features/ideas/domain/idea_source.dart';
 import 'package:idearadar/features/ideas/domain/idea_status.dart';
+import 'package:idearadar/features/problems/domain/problem.dart';
+import 'package:idearadar/features/problems/domain/problem_idea_link.dart';
+import 'package:idearadar/features/problems/domain/problem_question_link.dart';
 import 'package:idearadar/features/questions/domain/question.dart';
 import 'package:idearadar/features/questions/domain/question_idea_link.dart';
 import 'package:sqflite/sqflite.dart';
@@ -294,6 +297,221 @@ class SqliteIdeaRepository implements IdeaRepository {
       IdeaDatabase.questionIdeaLinksTable,
       where: 'question_id = ? AND idea_id = ?',
       whereArgs: [questionId, ideaId],
+    );
+  }
+
+  @override
+  Future<List<Problem>> getProblems() async {
+    final database = await _ideaDatabase.database;
+    final records = await database.query(
+      IdeaDatabase.problemsTable,
+      orderBy: 'updated_at DESC',
+    );
+    return records.map(_problemFromMap).toList(growable: false);
+  }
+
+  @override
+  Future<void> addProblem(Problem problem) async {
+    final database = await _ideaDatabase.database;
+    await database.insert(IdeaDatabase.problemsTable, _problemToMap(problem));
+  }
+
+  @override
+  Future<void> updateProblem(Problem problem) async {
+    final database = await _ideaDatabase.database;
+    final updatedRows = await database.update(
+      IdeaDatabase.problemsTable,
+      _problemToMap(problem),
+      where: 'id = ?',
+      whereArgs: [problem.id],
+    );
+    if (updatedRows != 1) {
+      throw StateError('Problem not found: ${problem.id}');
+    }
+  }
+
+  @override
+  Future<void> deleteProblem(String problemId) async {
+    final database = await _ideaDatabase.database;
+    final deletedRows = await database.delete(
+      IdeaDatabase.problemsTable,
+      where: 'id = ?',
+      whereArgs: [problemId],
+    );
+    if (deletedRows != 1) {
+      throw StateError('Problem not found: $problemId');
+    }
+  }
+
+  @override
+  Future<List<ProblemIdeaLink>> getProblemIdeaLinks({
+    String? problemId,
+    String? ideaId,
+  }) async {
+    final database = await _ideaDatabase.database;
+    final where = <String>[];
+    final args = <Object?>[];
+    if (problemId != null) {
+      where.add('problem_id = ?');
+      args.add(problemId);
+    }
+    if (ideaId != null) {
+      where.add('idea_id = ?');
+      args.add(ideaId);
+    }
+    final records = await database.query(
+      IdeaDatabase.problemIdeaLinksTable,
+      where: where.isEmpty ? null : where.join(' AND '),
+      whereArgs: args.isEmpty ? null : args,
+      orderBy: 'created_at DESC',
+    );
+    return records.map(_problemIdeaLinkFromMap).toList(growable: false);
+  }
+
+  @override
+  Future<void> addProblemIdeaLink(ProblemIdeaLink link) async {
+    final database = await _ideaDatabase.database;
+    await database.insert(
+      IdeaDatabase.problemIdeaLinksTable,
+      _problemIdeaLinkToMap(link),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  @override
+  Future<void> deleteProblemIdeaLink(String problemId, String ideaId) async {
+    final database = await _ideaDatabase.database;
+    await database.delete(
+      IdeaDatabase.problemIdeaLinksTable,
+      where: 'problem_id = ? AND idea_id = ?',
+      whereArgs: [problemId, ideaId],
+    );
+  }
+
+  @override
+  Future<List<ProblemQuestionLink>> getProblemQuestionLinks({
+    String? problemId,
+    String? questionId,
+  }) async {
+    final database = await _ideaDatabase.database;
+    final where = <String>[];
+    final args = <Object?>[];
+    if (problemId != null) {
+      where.add('problem_id = ?');
+      args.add(problemId);
+    }
+    if (questionId != null) {
+      where.add('question_id = ?');
+      args.add(questionId);
+    }
+    final records = await database.query(
+      IdeaDatabase.problemQuestionLinksTable,
+      where: where.isEmpty ? null : where.join(' AND '),
+      whereArgs: args.isEmpty ? null : args,
+      orderBy: 'created_at DESC',
+    );
+    return records.map(_problemQuestionLinkFromMap).toList(growable: false);
+  }
+
+  @override
+  Future<void> addProblemQuestionLink(ProblemQuestionLink link) async {
+    final database = await _ideaDatabase.database;
+    await database.insert(
+      IdeaDatabase.problemQuestionLinksTable,
+      _problemQuestionLinkToMap(link),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  @override
+  Future<void> deleteProblemQuestionLink(
+    String problemId,
+    String questionId,
+  ) async {
+    final database = await _ideaDatabase.database;
+    await database.delete(
+      IdeaDatabase.problemQuestionLinksTable,
+      where: 'problem_id = ? AND question_id = ?',
+      whereArgs: [problemId, questionId],
+    );
+  }
+
+  Map<String, Object?> _problemToMap(Problem problem) {
+    return {
+      'id': problem.id,
+      'title': problem.title,
+      'description': problem.description,
+      'affected_users': problem.affectedUsers,
+      'frequency': problem.frequency,
+      'severity': problem.severity,
+      'current_workaround': problem.currentWorkaround,
+      'evidence': problem.evidence,
+      'status': problem.status.name,
+      'created_at': problem.createdAt.toIso8601String(),
+      'updated_at': problem.updatedAt.toIso8601String(),
+    };
+  }
+
+  Problem _problemFromMap(Map<String, Object?> map) {
+    return Problem(
+      id: map['id']! as String,
+      title: map['title']! as String,
+      description: map['description']! as String,
+      affectedUsers: map['affected_users']! as String,
+      frequency: map['frequency']! as String,
+      severity: map['severity']! as String,
+      currentWorkaround: map['current_workaround']! as String,
+      evidence: map['evidence']! as String,
+      status: ProblemStatus.values.firstWhere(
+        (status) => status.name == map['status'],
+        orElse: () => ProblemStatus.observed,
+      ),
+      createdAt: DateTime.parse(map['created_at']! as String),
+      updatedAt: DateTime.parse(map['updated_at']! as String),
+    );
+  }
+
+  Map<String, Object?> _problemIdeaLinkToMap(ProblemIdeaLink link) {
+    return {
+      'problem_id': link.problemId,
+      'idea_id': link.ideaId,
+      'relation_type': link.relationType.name,
+      'created_at': link.createdAt.toIso8601String(),
+    };
+  }
+
+  ProblemIdeaLink _problemIdeaLinkFromMap(Map<String, Object?> map) {
+    return ProblemIdeaLink(
+      problemId: map['problem_id']! as String,
+      ideaId: map['idea_id']! as String,
+      relationType: ProblemIdeaRelationType.values.firstWhere(
+        (type) => type.name == map['relation_type'],
+        orElse: () => ProblemIdeaRelationType.related,
+      ),
+      createdAt: DateTime.parse(map['created_at']! as String),
+    );
+  }
+
+  Map<String, Object?> _problemQuestionLinkToMap(ProblemQuestionLink link) {
+    return {
+      'problem_id': link.problemId,
+      'question_id': link.questionId,
+      'relation_type': link.relationType.name,
+      'created_at': link.createdAt.toIso8601String(),
+    };
+  }
+
+  ProblemQuestionLink _problemQuestionLinkFromMap(
+    Map<String, Object?> map,
+  ) {
+    return ProblemQuestionLink(
+      problemId: map['problem_id']! as String,
+      questionId: map['question_id']! as String,
+      relationType: ProblemQuestionRelationType.values.firstWhere(
+        (type) => type.name == map['relation_type'],
+        orElse: () => ProblemQuestionRelationType.related,
+      ),
+      createdAt: DateTime.parse(map['created_at']! as String),
     );
   }
 
