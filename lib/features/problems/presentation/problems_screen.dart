@@ -143,7 +143,7 @@ class _ProblemsScreenState extends State<ProblemsScreen> {
                             child: _ProblemSummaryCard(
                               label: ptx(context, 'active_problems'),
                               value: '$activeCount',
-                              icon: Icons.radar_outlined,
+                              icon: Icons.report_problem_outlined,
                             ),
                           ),
                         ],
@@ -256,7 +256,7 @@ class _EmptyProblems extends StatelessWidget {
         child: Column(
           children: [
             Icon(
-              Icons.radar_outlined,
+              Icons.report_problem_outlined,
               size: 48,
               color: Theme.of(context).colorScheme.primary,
             ),
