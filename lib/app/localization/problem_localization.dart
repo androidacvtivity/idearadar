@@ -32,11 +32,13 @@ const _problemTranslations = <String, Map<String, String>>{
     'frequency': 'How often does it happen?',
     'frequency_hint': 'Daily, weekly, occasionally...',
     'severity': 'How serious is it?',
-    'severity_hint': 'What does the problem cost in time, money, or frustration?',
+    'severity_hint':
+        'What does the problem cost in time, money, or frustration?',
     'current_workaround': 'How is it solved today?',
     'current_workaround_hint': 'Existing workaround, tool, or manual process',
     'problem_evidence': 'Evidence / observations',
-    'problem_evidence_hint': 'Interviews, examples, repeated observations, numbers...',
+    'problem_evidence_hint':
+        'Interviews, examples, repeated observations, numbers...',
     'problem_status': 'Status',
     'problem_status_observed': 'Observed',
     'problem_status_researching': 'Researching',
@@ -52,7 +54,8 @@ const _problemTranslations = <String, Map<String, String>>{
     'problem_delete_error': 'The problem could not be deleted.',
     'delete_problem': 'Delete problem',
     'delete_problem_confirm': 'Delete this problem?',
-    'delete_problem_desc': 'The problem and its links will be permanently deleted.',
+    'delete_problem_desc':
+        'The problem and its links will be permanently deleted.',
     'problem_details': 'Problem details',
     'create_question_from_problem': 'Create question',
     'create_idea_from_problem': 'Create idea',
@@ -66,7 +69,8 @@ const _problemTranslations = <String, Map<String, String>>{
   },
   'ro': {
     'problems': 'Probleme',
-    'problems_subtitle': 'Notează probleme reale înainte să decizi ce construiești.',
+    'problems_subtitle':
+        'Notează probleme reale înainte să decizi ce construiești.',
     'new_problem': 'Problemă nouă',
     'edit_problem': 'Editează problema',
     'problem_title': 'Problemă',
@@ -80,9 +84,11 @@ const _problemTranslations = <String, Map<String, String>>{
     'severity': 'Cât de serioasă este?',
     'severity_hint': 'Ce cost are în timp, bani sau frustrare?',
     'current_workaround': 'Cum este rezolvată astăzi?',
-    'current_workaround_hint': 'Soluția actuală, instrumentul sau procesul manual',
+    'current_workaround_hint':
+        'Soluția actuală, instrumentul sau procesul manual',
     'problem_evidence': 'Dovezi / observații',
-    'problem_evidence_hint': 'Interviuri, exemple, observații repetate, cifre...',
+    'problem_evidence_hint':
+        'Interviuri, exemple, observații repetate, cifre...',
     'problem_status': 'Statut',
     'problem_status_observed': 'Observată',
     'problem_status_researching': 'În cercetare',
@@ -92,7 +98,8 @@ const _problemTranslations = <String, Map<String, String>>{
     'save_problem': 'Salvează problema',
     'save_changes': 'Salvează modificările',
     'no_problems': 'Nu există încă probleme',
-    'no_problems_desc': 'Notează o problemă reală înainte să sari direct la soluție.',
+    'no_problems_desc':
+        'Notează o problemă reală înainte să sari direct la soluție.',
     'problems_load_error': 'Problemele nu au putut fi încărcate.',
     'problem_save_error': 'Problema nu a putut fi salvată.',
     'problem_delete_error': 'Problema nu a putut fi ștearsă.',

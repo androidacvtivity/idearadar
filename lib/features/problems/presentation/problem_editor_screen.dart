@@ -27,12 +27,19 @@ class _ProblemEditorScreenState extends State<ProblemEditorScreen> {
     super.initState();
     final problem = widget.problem;
     _titleController = TextEditingController(text: problem?.title ?? '');
-    _descriptionController = TextEditingController(text: problem?.description ?? '');
-    _affectedUsersController = TextEditingController(text: problem?.affectedUsers ?? '');
-    _frequencyController = TextEditingController(text: problem?.frequency ?? '');
+    _descriptionController = TextEditingController(
+      text: problem?.description ?? '',
+    );
+    _affectedUsersController = TextEditingController(
+      text: problem?.affectedUsers ?? '',
+    );
+    _frequencyController = TextEditingController(
+      text: problem?.frequency ?? '',
+    );
     _severityController = TextEditingController(text: problem?.severity ?? '');
-    _currentWorkaroundController =
-        TextEditingController(text: problem?.currentWorkaround ?? '');
+    _currentWorkaroundController = TextEditingController(
+      text: problem?.currentWorkaround ?? '',
+    );
     _evidenceController = TextEditingController(text: problem?.evidence ?? '');
     _status = problem?.status ?? ProblemStatus.observed;
   }

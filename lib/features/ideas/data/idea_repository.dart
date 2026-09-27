@@ -51,7 +51,10 @@ abstract interface class IdeaRepository {
 
   Future<void> deleteQuestion(String questionId);
 
-  Future<List<QuestionIdeaLink>> getQuestionIdeaLinks({String? questionId, String? ideaId});
+  Future<List<QuestionIdeaLink>> getQuestionIdeaLinks({
+    String? questionId,
+    String? ideaId,
+  });
 
   Future<void> addQuestionIdeaLink(QuestionIdeaLink link);
 

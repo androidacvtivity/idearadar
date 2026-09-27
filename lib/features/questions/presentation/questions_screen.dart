@@ -100,61 +100,61 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _error != null
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(_error!, textAlign: TextAlign.center),
-                          const SizedBox(height: 12),
-                          OutlinedButton.icon(
-                            onPressed: _load,
-                            icon: const Icon(Icons.refresh),
-                            label: Text(qtx(context, 'try_again')),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 104),
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        qtx(context, 'questions_subtitle'),
-                        style: Theme.of(context).textTheme.bodyLarge,
+                      Text(_error!, textAlign: TextAlign.center),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: _load,
+                        icon: const Icon(Icons.refresh),
+                        label: Text(qtx(context, 'try_again')),
                       ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _QuestionSummaryCard(
-                              label: qtx(context, 'today'),
-                              value: '$todayCount',
-                              icon: Icons.today_outlined,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _QuestionSummaryCard(
-                              label: qtx(context, 'open_questions'),
-                              value: '$openCount',
-                              icon: Icons.help_outline,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      if (_questions.isEmpty)
-                        _EmptyQuestions(onAdd: _addQuestion)
-                      else
-                        for (final question in _questions)
-                          _QuestionCard(
-                            question: question,
-                            onTap: () => _openQuestion(question),
-                          ),
                     ],
                   ),
+                ),
+              )
+            : ListView(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 104),
+                children: [
+                  Text(
+                    qtx(context, 'questions_subtitle'),
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _QuestionSummaryCard(
+                          label: qtx(context, 'today'),
+                          value: '$todayCount',
+                          icon: Icons.today_outlined,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _QuestionSummaryCard(
+                          label: qtx(context, 'open_questions'),
+                          value: '$openCount',
+                          icon: Icons.help_outline,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  if (_questions.isEmpty)
+                    _EmptyQuestions(onAdd: _addQuestion)
+                  else
+                    for (final question in _questions)
+                      _QuestionCard(
+                        question: question,
+                        onTap: () => _openQuestion(question),
+                      ),
+                ],
+              ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'questions_add_question',
@@ -227,10 +227,9 @@ class _QuestionSummaryCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               value,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
             Text(label),
           ],
@@ -260,10 +259,9 @@ class _EmptyQuestions extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               qtx(context, 'no_questions'),
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             Text(

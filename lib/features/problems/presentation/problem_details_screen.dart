@@ -65,9 +65,7 @@ class _ProblemDetailsScreenState extends State<ProblemDetailsScreen> {
 
   Future<void> _editProblem() async {
     final updated = await Navigator.of(context).push<Problem>(
-      MaterialPageRoute(
-        builder: (_) => ProblemEditorScreen(problem: _problem),
-      ),
+      MaterialPageRoute(builder: (_) => ProblemEditorScreen(problem: _problem)),
     );
     if (!mounted || updated == null) return;
 
@@ -177,10 +175,9 @@ class _ProblemDetailsScreenState extends State<ProblemDetailsScreen> {
         children: [
           Text(
             _problem.title,
-            style: Theme.of(context)
-                .textTheme
-                .headlineSmall
-                ?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           Chip(label: Text(localizedProblemStatus(context, _problem.status))),
@@ -232,10 +229,9 @@ class _ProblemDetailsScreenState extends State<ProblemDetailsScreen> {
           const SizedBox(height: 24),
           Text(
             ptx(context, 'linked_questions'),
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           if (_linkedQuestions.isEmpty)
@@ -251,10 +247,9 @@ class _ProblemDetailsScreenState extends State<ProblemDetailsScreen> {
           const SizedBox(height: 20),
           Text(
             ptx(context, 'linked_ideas'),
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           if (_linkedIdeas.isEmpty)
@@ -291,10 +286,9 @@ class _DetailSection extends StatelessWidget {
           children: [
             Text(
               title,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 6),
             Text(text),

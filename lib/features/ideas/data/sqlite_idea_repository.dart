@@ -211,7 +211,6 @@ class SqliteIdeaRepository implements IdeaRepository {
     }
   }
 
-
   @override
   Future<List<Question>> getQuestions() async {
     final database = await _ideaDatabase.database;
@@ -225,7 +224,10 @@ class SqliteIdeaRepository implements IdeaRepository {
   @override
   Future<void> addQuestion(Question question) async {
     final database = await _ideaDatabase.database;
-    await database.insert(IdeaDatabase.questionsTable, _questionToMap(question));
+    await database.insert(
+      IdeaDatabase.questionsTable,
+      _questionToMap(question),
+    );
   }
 
   @override
@@ -501,9 +503,7 @@ class SqliteIdeaRepository implements IdeaRepository {
     };
   }
 
-  ProblemQuestionLink _problemQuestionLinkFromMap(
-    Map<String, Object?> map,
-  ) {
+  ProblemQuestionLink _problemQuestionLinkFromMap(Map<String, Object?> map) {
     return ProblemQuestionLink(
       problemId: map['problem_id']! as String,
       questionId: map['question_id']! as String,

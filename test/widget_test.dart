@@ -459,8 +459,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('What problem appears most often?'), findsOneWidget);
-    expect((await repository.getQuestions()).single.title,
-        'What problem appears most often?');
+    expect(
+      (await repository.getQuestions()).single.title,
+      'What problem appears most often?',
+    );
   });
 
   testWidgets('creates and displays a standalone problem', (tester) async {
@@ -494,5 +496,4 @@ void main() {
     expect(savedProblem.status.name, 'observed');
     expect(savedProblem.description, contains('scattered'));
   });
-
 }

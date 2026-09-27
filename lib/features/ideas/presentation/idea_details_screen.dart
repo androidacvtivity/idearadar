@@ -305,10 +305,8 @@ class IdeaDetailsScreen extends StatelessWidget {
                 key: const Key('idea_questions_tile'),
                 onTap: () => Navigator.of(context).push<void>(
                   MaterialPageRoute(
-                    builder: (_) => IdeaQuestionsScreen(
-                      idea: idea,
-                      repository: repository,
-                    ),
+                    builder: (_) =>
+                        IdeaQuestionsScreen(idea: idea, repository: repository),
                   ),
                 ),
                 leading: CircleAvatar(

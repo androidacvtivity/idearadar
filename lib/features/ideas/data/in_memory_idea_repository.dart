@@ -28,8 +28,9 @@ class InMemoryIdeaRepository implements IdeaRepository {
        _questionIdeaLinks = List<QuestionIdeaLink>.from(seedQuestionIdeaLinks),
        _problems = List<Problem>.from(seedProblems),
        _problemIdeaLinks = List<ProblemIdeaLink>.from(seedProblemIdeaLinks),
-       _problemQuestionLinks =
-           List<ProblemQuestionLink>.from(seedProblemQuestionLinks);
+       _problemQuestionLinks = List<ProblemQuestionLink>.from(
+         seedProblemQuestionLinks,
+       );
 
   final List<Idea> _ideas;
   final List<IdeaNote> _notes;
@@ -235,7 +236,9 @@ class InMemoryIdeaRepository implements IdeaRepository {
       throw StateError('Idea not found: ${link.ideaId}');
     }
     _questionIdeaLinks.removeWhere(
-      (current) => current.questionId == link.questionId && current.ideaId == link.ideaId,
+      (current) =>
+          current.questionId == link.questionId &&
+          current.ideaId == link.ideaId,
     );
     _questionIdeaLinks.add(link);
   }
@@ -345,8 +348,7 @@ class InMemoryIdeaRepository implements IdeaRepository {
     String questionId,
   ) async {
     _problemQuestionLinks.removeWhere(
-      (link) =>
-          link.problemId == problemId && link.questionId == questionId,
+      (link) => link.problemId == problemId && link.questionId == questionId,
     );
   }
 }

@@ -104,61 +104,61 @@ class _ProblemsScreenState extends State<ProblemsScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _error != null
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(_error!, textAlign: TextAlign.center),
-                          const SizedBox(height: 12),
-                          OutlinedButton.icon(
-                            onPressed: _load,
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Retry'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 104),
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        ptx(context, 'problems_subtitle'),
-                        style: Theme.of(context).textTheme.bodyLarge,
+                      Text(_error!, textAlign: TextAlign.center),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: _load,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Retry'),
                       ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _ProblemSummaryCard(
-                              label: ptx(context, 'today'),
-                              value: '$todayCount',
-                              icon: Icons.today_outlined,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _ProblemSummaryCard(
-                              label: ptx(context, 'active_problems'),
-                              value: '$activeCount',
-                              icon: Icons.report_problem_outlined,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      if (_problems.isEmpty)
-                        _EmptyProblems(onAdd: _addProblem)
-                      else
-                        for (final problem in _problems)
-                          _ProblemCard(
-                            problem: problem,
-                            onTap: () => _openProblem(problem),
-                          ),
                     ],
                   ),
+                ),
+              )
+            : ListView(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 104),
+                children: [
+                  Text(
+                    ptx(context, 'problems_subtitle'),
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _ProblemSummaryCard(
+                          label: ptx(context, 'today'),
+                          value: '$todayCount',
+                          icon: Icons.today_outlined,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _ProblemSummaryCard(
+                          label: ptx(context, 'active_problems'),
+                          value: '$activeCount',
+                          icon: Icons.report_problem_outlined,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  if (_problems.isEmpty)
+                    _EmptyProblems(onAdd: _addProblem)
+                  else
+                    for (final problem in _problems)
+                      _ProblemCard(
+                        problem: problem,
+                        onTap: () => _openProblem(problem),
+                      ),
+                ],
+              ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'problems_add_problem',
@@ -230,10 +230,9 @@ class _ProblemSummaryCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               value,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
             Text(label),
           ],
@@ -263,16 +262,12 @@ class _EmptyProblems extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               ptx(context, 'no_problems'),
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
-            Text(
-              ptx(context, 'no_problems_desc'),
-              textAlign: TextAlign.center,
-            ),
+            Text(ptx(context, 'no_problems_desc'), textAlign: TextAlign.center),
             const SizedBox(height: 18),
             FilledButton.icon(
               onPressed: onAdd,
