@@ -3,7 +3,7 @@ import 'package:sqflite/sqflite.dart';
 
 class IdeaDatabase {
   static const databaseName = 'idearadar.db';
-  static const databaseVersion = 6;
+  static const databaseVersion = 7;
   static const ideasTable = 'ideas';
   static const notesTable = 'idea_notes';
   static const sourcesTable = 'idea_sources';
@@ -13,6 +13,7 @@ class IdeaDatabase {
   static const problemsTable = 'problems';
   static const problemIdeaLinksTable = 'problem_idea_links';
   static const problemQuestionLinksTable = 'problem_question_links';
+  static const appMetadataTable = 'app_metadata';
 
   Database? _database;
 
@@ -40,6 +41,8 @@ class IdeaDatabase {
         await _createProblemsTable(database);
         await _createProblemIdeaLinksTable(database);
         await _createProblemQuestionLinksTable(database);
+        await _createAppMetadataTable(database);
+        await _seedDemoData(database);
       },
       onUpgrade: (database, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -59,6 +62,10 @@ class IdeaDatabase {
           await _createProblemsTable(database);
           await _createProblemIdeaLinksTable(database);
           await _createProblemQuestionLinksTable(database);
+        }
+        if (oldVersion < 7) {
+          await _createAppMetadataTable(database);
+          await _seedDemoData(database);
         }
       },
     );
@@ -211,6 +218,234 @@ class IdeaDatabase {
         FOREIGN KEY (question_id) REFERENCES $questionsTable (id) ON DELETE CASCADE
       )
     ''');
+  }
+
+  static Future<void> _createAppMetadataTable(Database database) {
+    return database.execute('''
+      CREATE TABLE IF NOT EXISTS $appMetadataTable (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    ''');
+  }
+
+  static Future<void> _seedDemoData(Database database) async {
+    const seedKey = 'demo_seed_v1';
+    final existing = await database.query(
+      appMetadataTable,
+      columns: ['value'],
+      where: 'key = ?',
+      whereArgs: [seedKey],
+      limit: 1,
+    );
+    if (existing.isNotEmpty) {
+      return;
+    }
+
+    final now = DateTime(2026, 9, 27, 12).toIso8601String();
+
+    const roProblemId = 'demo-problem-ro';
+    const roQuestionId = 'demo-question-ro';
+    const roIdeaId = 'demo-idea-ro';
+
+    const enProblemId = 'demo-problem-en';
+    const enQuestionId = 'demo-question-en';
+    const enIdeaId = 'demo-idea-en';
+
+    final batch = database.batch();
+
+    batch.insert(
+      problemsTable,
+      {
+        'id': roProblemId,
+        'title': 'Oamenii ocupați uită sarcini mici, dar importante',
+        'description':
+            'Sarcinile sunt notate în locuri diferite — mesaje, hârtie și aplicații de notițe — iar uneori sunt uitate.',
+        'affected_users':
+            'Persoane ocupate, părinți, angajați și persoane care gestionează multe activități zilnice.',
+        'frequency': 'Frecvent, pe parcursul săptămânii.',
+        'severity':
+            'Poate duce la întârzieri, stres și activități importante ratate.',
+        'current_workaround':
+            'Liste pe hârtie, aplicații de notițe, alarme și mesaje trimise către sine.',
+        'evidence':
+            'Exemplu demonstrativ: observă problema și adaugă dovezi reale înainte de a construi soluția.',
+        'status': 'observed',
+        'created_at': now,
+        'updated_at': now,
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+
+    batch.insert(
+      questionsTable,
+      {
+        'id': roQuestionId,
+        'title':
+            'Care este cel mai simplu mod de a le reaminti oamenilor sarcinile importante fără să-i deranjeze?',
+        'details':
+            'Caută să înțelegi când, unde și prin ce tip de notificare ar fi util un reminder.',
+        'answer': '',
+        'status': 'open',
+        'created_at': now,
+        'updated_at': now,
+        'answered_at': null,
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+
+    batch.insert(
+      ideasTable,
+      {
+        'id': roIdeaId,
+        'title': 'Reminder simplu pentru sarcinile importante',
+        'summary':
+            'O aplicație care afișează câteva sarcini importante la momentele potrivite ale zilei.',
+        'problem':
+            'Oamenii ocupați uită sarcini mici, dar importante.',
+        'solution':
+            'Un reminder simplu și discret, concentrat doar pe sarcinile importante.',
+        'domain': 'Productivitate',
+        'target_users': 'Persoane ocupate, părinți și angajați.',
+        'paying_customer': 'Utilizatorul individual.',
+        'status': 'newIdea',
+        'created_at': now,
+        'updated_at': now,
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+
+    batch.insert(
+      problemsTable,
+      {
+        'id': enProblemId,
+        'title': 'Useful information gets saved without context',
+        'description':
+            'Interesting articles, products, ideas, and resources are scattered across browsers, messages, screenshots, and notes.',
+        'affected_users':
+            'Students, professionals, researchers, entrepreneurs, and curious internet users.',
+        'frequency': 'Several times a week for active internet users.',
+        'severity':
+            'Useful information is difficult to rediscover and often loses its original meaning.',
+        'current_workaround':
+            'Browser bookmarks, screenshots, note-taking apps, and sending links to yourself.',
+        'evidence':
+            'Demo example: validate the problem with real observations before building a solution.',
+        'status': 'observed',
+        'created_at': now,
+        'updated_at': now,
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+
+    batch.insert(
+      questionsTable,
+      {
+        'id': enQuestionId,
+        'title':
+            'How could useful information be captured together with the reason it was saved?',
+        'details':
+            'Explore what minimum context would make a saved resource useful again later.',
+        'answer': '',
+        'status': 'open',
+        'created_at': now,
+        'updated_at': now,
+        'answered_at': null,
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+
+    batch.insert(
+      ideasTable,
+      {
+        'id': enIdeaId,
+        'title': 'Save links with a short reason',
+        'summary':
+            'A lightweight app that saves a link together with a short note explaining why it matters.',
+        'problem': 'Useful information gets saved without context.',
+        'solution':
+            'Save each resource together with a short reason, tag, and optional next action.',
+        'domain': 'Knowledge management',
+        'target_users':
+            'Students, professionals, researchers, and entrepreneurs.',
+        'paying_customer': 'The individual user.',
+        'status': 'newIdea',
+        'created_at': now,
+        'updated_at': now,
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+
+    for (final values in [
+      {
+        'problem_id': roProblemId,
+        'question_id': roQuestionId,
+        'relation_type': 'problemCreatedQuestion',
+        'created_at': now,
+      },
+      {
+        'problem_id': enProblemId,
+        'question_id': enQuestionId,
+        'relation_type': 'problemCreatedQuestion',
+        'created_at': now,
+      },
+    ]) {
+      batch.insert(
+        problemQuestionLinksTable,
+        values,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+
+    for (final values in [
+      {
+        'problem_id': roProblemId,
+        'idea_id': roIdeaId,
+        'relation_type': 'problemCreatedIdea',
+        'created_at': now,
+      },
+      {
+        'problem_id': enProblemId,
+        'idea_id': enIdeaId,
+        'relation_type': 'problemCreatedIdea',
+        'created_at': now,
+      },
+    ]) {
+      batch.insert(
+        problemIdeaLinksTable,
+        values,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+
+    for (final values in [
+      {
+        'question_id': roQuestionId,
+        'idea_id': roIdeaId,
+        'relation_type': 'questionCreatedIdea',
+        'created_at': now,
+      },
+      {
+        'question_id': enQuestionId,
+        'idea_id': enIdeaId,
+        'relation_type': 'questionCreatedIdea',
+        'created_at': now,
+      },
+    ]) {
+      batch.insert(
+        questionIdeaLinksTable,
+        values,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+
+    batch.insert(
+      appMetadataTable,
+      {'key': seedKey, 'value': '1'},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    await batch.commit(noResult: true);
   }
 
   Future<Database> get database async {
