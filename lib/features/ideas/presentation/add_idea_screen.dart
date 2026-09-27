@@ -9,12 +9,14 @@ class AddIdeaScreen extends StatefulWidget {
     this.idea,
     this.initialTitle,
     this.initialSummary,
+    this.initialProblem,
     super.key,
   });
 
   final Idea? idea;
   final String? initialTitle;
   final String? initialSummary;
+  final String? initialProblem;
 
   @override
   State<AddIdeaScreen> createState() => _AddIdeaScreenState();
@@ -40,6 +42,7 @@ class _AddIdeaScreenState extends State<AddIdeaScreen> {
     if (idea == null) {
       _titleController.text = widget.initialTitle ?? '';
       _summaryController.text = widget.initialSummary ?? '';
+      _problemController.text = widget.initialProblem ?? '';
       return;
     }
     _titleController.text = idea.title;
