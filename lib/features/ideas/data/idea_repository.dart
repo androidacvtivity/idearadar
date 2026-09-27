@@ -2,6 +2,9 @@ import 'package:idearadar/features/ideas/domain/idea.dart';
 import 'package:idearadar/features/ideas/domain/idea_assumption.dart';
 import 'package:idearadar/features/ideas/domain/idea_note.dart';
 import 'package:idearadar/features/ideas/domain/idea_source.dart';
+import 'package:idearadar/features/problems/domain/problem.dart';
+import 'package:idearadar/features/problems/domain/problem_idea_link.dart';
+import 'package:idearadar/features/problems/domain/problem_question_link.dart';
 import 'package:idearadar/features/questions/domain/question.dart';
 import 'package:idearadar/features/questions/domain/question_idea_link.dart';
 
@@ -53,4 +56,30 @@ abstract interface class IdeaRepository {
   Future<void> addQuestionIdeaLink(QuestionIdeaLink link);
 
   Future<void> deleteQuestionIdeaLink(String questionId, String ideaId);
+
+  Future<List<Problem>> getProblems();
+
+  Future<void> addProblem(Problem problem);
+
+  Future<void> updateProblem(Problem problem);
+
+  Future<void> deleteProblem(String problemId);
+
+  Future<List<ProblemIdeaLink>> getProblemIdeaLinks({
+    String? problemId,
+    String? ideaId,
+  });
+
+  Future<void> addProblemIdeaLink(ProblemIdeaLink link);
+
+  Future<void> deleteProblemIdeaLink(String problemId, String ideaId);
+
+  Future<List<ProblemQuestionLink>> getProblemQuestionLinks({
+    String? problemId,
+    String? questionId,
+  });
+
+  Future<void> addProblemQuestionLink(ProblemQuestionLink link);
+
+  Future<void> deleteProblemQuestionLink(String problemId, String questionId);
 }
