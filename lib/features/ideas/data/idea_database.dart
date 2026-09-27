@@ -3,13 +3,16 @@ import 'package:sqflite/sqflite.dart';
 
 class IdeaDatabase {
   static const databaseName = 'idearadar.db';
-  static const databaseVersion = 5;
+  static const databaseVersion = 6;
   static const ideasTable = 'ideas';
   static const notesTable = 'idea_notes';
   static const sourcesTable = 'idea_sources';
   static const assumptionsTable = 'idea_assumptions';
   static const questionsTable = 'questions';
   static const questionIdeaLinksTable = 'question_idea_links';
+  static const problemsTable = 'problems';
+  static const problemIdeaLinksTable = 'problem_idea_links';
+  static const problemQuestionLinksTable = 'problem_question_links';
 
   Database? _database;
 
@@ -34,6 +37,9 @@ class IdeaDatabase {
         await _createAssumptionsTable(database);
         await _createQuestionsTable(database);
         await _createQuestionIdeaLinksTable(database);
+        await _createProblemsTable(database);
+        await _createProblemIdeaLinksTable(database);
+        await _createProblemQuestionLinksTable(database);
       },
       onUpgrade: (database, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -48,6 +54,11 @@ class IdeaDatabase {
         if (oldVersion < 5) {
           await _createQuestionsTable(database);
           await _createQuestionIdeaLinksTable(database);
+        }
+        if (oldVersion < 6) {
+          await _createProblemsTable(database);
+          await _createProblemIdeaLinksTable(database);
+          await _createProblemQuestionLinksTable(database);
         }
       },
     );
@@ -152,6 +163,52 @@ class IdeaDatabase {
         PRIMARY KEY (question_id, idea_id),
         FOREIGN KEY (question_id) REFERENCES $questionsTable (id) ON DELETE CASCADE,
         FOREIGN KEY (idea_id) REFERENCES $ideasTable (id) ON DELETE CASCADE
+      )
+    ''');
+  }
+
+  static Future<void> _createProblemsTable(Database database) {
+    return database.execute('''
+      CREATE TABLE $problemsTable (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        affected_users TEXT NOT NULL DEFAULT '',
+        frequency TEXT NOT NULL DEFAULT '',
+        severity TEXT NOT NULL DEFAULT '',
+        current_workaround TEXT NOT NULL DEFAULT '',
+        evidence TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    ''');
+  }
+
+  static Future<void> _createProblemIdeaLinksTable(Database database) {
+    return database.execute('''
+      CREATE TABLE $problemIdeaLinksTable (
+        problem_id TEXT NOT NULL,
+        idea_id TEXT NOT NULL,
+        relation_type TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (problem_id, idea_id),
+        FOREIGN KEY (problem_id) REFERENCES $problemsTable (id) ON DELETE CASCADE,
+        FOREIGN KEY (idea_id) REFERENCES $ideasTable (id) ON DELETE CASCADE
+      )
+    ''');
+  }
+
+  static Future<void> _createProblemQuestionLinksTable(Database database) {
+    return database.execute('''
+      CREATE TABLE $problemQuestionLinksTable (
+        problem_id TEXT NOT NULL,
+        question_id TEXT NOT NULL,
+        relation_type TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (problem_id, question_id),
+        FOREIGN KEY (problem_id) REFERENCES $problemsTable (id) ON DELETE CASCADE,
+        FOREIGN KEY (question_id) REFERENCES $questionsTable (id) ON DELETE CASCADE
       )
     ''');
   }
