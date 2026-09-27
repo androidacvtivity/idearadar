@@ -11,37 +11,6 @@ Future<InMemoryIdeaRepository> pumpIdeaRadar(WidgetTester tester) async {
   await tester.pumpWidget(IdeaRadarApp(repository: repository));
   await tester.pumpAndSettle();
   return repository;
-  testWidgets('creates and displays a standalone problem', (tester) async {
-    final repository = await pumpIdeaRadar(tester);
-
-    await tester.tap(find.text('Problems'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Problems'), findsWidgets);
-    expect(find.text('No problems yet'), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('new_problem_button')));
-    await tester.pumpAndSettle();
-
-    await tester.enterText(
-      find.byKey(const Key('problem_title_field')),
-      'Residents miss important building notices',
-    );
-    await tester.enterText(
-      find.byKey(const Key('problem_description_field')),
-      'Important information is scattered across chats and paper notices.',
-    );
-    await tester.tap(find.byKey(const Key('save_problem_button')));
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text('Residents miss important building notices'),
-      findsOneWidget,
-    );
-    final savedProblem = (await repository.getProblems()).single;
-    expect(savedProblem.status.name, 'observed');
-    expect(savedProblem.description, contains('scattered'));
-  });
 }
 
 void main() {
@@ -493,4 +462,37 @@ void main() {
     expect((await repository.getQuestions()).single.title,
         'What problem appears most often?');
   });
+
+  testWidgets('creates and displays a standalone problem', (tester) async {
+    final repository = await pumpIdeaRadar(tester);
+
+    await tester.tap(find.text('Problems'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Problems'), findsWidgets);
+    expect(find.text('No problems yet'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('new_problem_button')));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('problem_title_field')),
+      'Residents miss important building notices',
+    );
+    await tester.enterText(
+      find.byKey(const Key('problem_description_field')),
+      'Important information is scattered across chats and paper notices.',
+    );
+    await tester.tap(find.byKey(const Key('save_problem_button')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Residents miss important building notices'),
+      findsOneWidget,
+    );
+    final savedProblem = (await repository.getProblems()).single;
+    expect(savedProblem.status.name, 'observed');
+    expect(savedProblem.description, contains('scattered'));
+  });
+
 }
